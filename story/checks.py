@@ -2,9 +2,10 @@ import re
 
 WORD_RANGE = (400, 800)  # accepted range (~5-10 min read-aloud); the prompt targets 450-650
 MAX_GRADE = {"5-7": 3.0, "8-10": 5.0}  # Flesch-Kincaid grade caps per age band
+# Only unambiguous refusals: a match blocks the story. Softer cases ("Sure, here you go") are left to the judge's story_only check.
 META_OPENER = re.compile(
-    r"^\W*(i can't|i cannot|i won't|i'm (sorry|not able|unable)|sorry,|unfortunately|sure[,!]|of course[,!]|certainly[,!]"
-    r"|here's (a|your|the)|here is (a|your|the))",
+    r"^\W*(i can't|i cannot|i won't|i'm (sorry|not able|unable)|i am (sorry|not able|unable)"
+    r"|here's (a|your) (\w+ )?(story|version)|here is (a|your) (\w+ )?(story|version))",
     re.I,
 )
 
@@ -20,8 +21,8 @@ def split_title(story: str) -> tuple[str, str]:
     """The storyteller puts the title on the first line; grade and count only the body."""
     lines = _normalize(story).strip().splitlines()
     first = lines[0] if lines else ""
-    looks_like_refusal = META_OPENER.match(first) and re.search(r"[.!?:,]\W*$", first)  # titles rarely end like a sentence
-    if len(lines) > 1 and len(first.split()) <= 12 and not looks_like_refusal:
+    ends_like_sentence = re.search(r"[.:,]\W*$", first)  # titles rarely end with a period; "!" and "?" titles are fine
+    if len(lines) > 1 and len(first.split()) <= 12 and not ends_like_sentence:
         return lines[0], "\n".join(lines[1:]).strip()
     return "", "\n".join(lines)
 

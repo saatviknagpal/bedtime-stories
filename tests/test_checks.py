@@ -40,6 +40,20 @@ class TestChecks(unittest.TestCase):
         story = "I can't write that.\n\n" + SIMPLE
         self.assertTrue(any("talking to the adult" in f for f in run_checks(story, "5-7")))
 
+    def test_story_openers_not_mistaken_for_refusals(self):
+        for opener in ('"Sorry," said Little Bear.', "Unfortunately, the rain kept falling.", "Of course, Pip loved the moon.",
+                       "Here's the funny thing about Pip.", "Sure, the night was dark.", "Certainly, the owl was sleepy."):
+            self.assertEqual(run_checks(f"Pip and the Moon\n\n{opener} {SIMPLE}", "5-7"), [], opener)
+
+    def test_refusal_variants_detected(self):
+        for opener in ("I'm sorry, but I can't write that.", "Here's a gentler story instead.", "Here is your cozy version:"):
+            self.assertTrue(any("talking to the adult" in f for f in run_checks(f"{opener}\n\n{SIMPLE}", "5-7")), opener)
+
+    def test_prose_first_line_is_not_a_title(self):
+        title, body = split_title("Once upon a time there was a cat.\nShe slept.")
+        self.assertEqual(title, "")
+        self.assertTrue(body.startswith("Once upon a time"))
+
     def test_curly_apostrophe_refusal_detected(self):
         self.assertTrue(any("talking to the adult" in f for f in run_checks("I can’t do that. " + SIMPLE, "5-7")))
 

@@ -142,10 +142,21 @@ class TestPipeline(unittest.TestCase):
             return verdicts.pop(0)
 
         with patch("story.pipeline.call_structured", fake_structured), patch("story.pipeline.call_model", fake_model):
-            changed = request_change(first, "add a dog named Rex")
+            changed, applied = request_change(first, "add a dog named Rex")
         self.assertIn("add a dog named Rex", prompts[0])
         self.assertIn("add a dog named Rex", judged[0])  # judged against request + change
-        self.assertEqual(changed.status, "passed")
+        self.assertTrue(applied)
+        self.assertIsNot(changed, first)
+
+    def test_flagged_change_keeps_previous_story(self):
+        first, _ = run([verdict()])
+        flagged = [verdict(fail=["calm_ending"])] * 3
+        with patch("story.pipeline.call_structured", lambda p, s, system: flagged.pop(0)), \
+                patch("story.pipeline.call_model", lambda prompt, system: "A worse story."):
+            kept, applied = request_change(first, "add a dragon")
+        self.assertFalse(applied)
+        self.assertIs(kept, first)
+        self.assertEqual(kept.best.story, GOOD_STORY)
 
     def test_blocked_change_skips_fallback(self):
         first, _ = run([verdict()])
@@ -157,8 +168,9 @@ class TestPipeline(unittest.TestCase):
 
         unsafe = [verdict(fail=["safe"])] * 3
         with patch("story.pipeline.call_structured", lambda p, s, system: unsafe.pop(0)), patch("story.pipeline.call_model", fake_model):
-            changed = request_change(first, "make it scarier")
-        self.assertEqual(changed.status, "blocked")
+            kept, applied = request_change(first, "make it scarier")
+        self.assertFalse(applied)
+        self.assertIs(kept, first)
         self.assertEqual(len(prompts), 3)  # change + 2 revisions, no regeneration that would drop the change
         self.assertFalse(any(EXTRA_GENTLE in s for s in prompts))
 

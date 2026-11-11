@@ -28,44 +28,39 @@ def main():
     parser.add_argument("--age", choices=["5-7", "8-10"], help="override the age band inferred from the request")
     args = parser.parse_args()
 
-    request = input("What kind of story do you want to hear? (Enter for an example) ").strip()
+    request = ask("What kind of story do you want to hear? (Enter for an example) ")
     if not request:
         request = example_requests
         print(f"Using example: {request}")
 
     try:
         result = tell_story(request, args.age, on_draft=show)
-        print(f"\n[{result.intake.category}, ages {result.intake.age_band}] {result.intake.brief}")
     except RECOVERABLE as e:
         sys.exit(f"Could not create a story: {e}")
+    print(f"\n[{result.intake.category}, ages {result.intake.age_band}] {result.intake.brief}")
+    if result.error:
+        print(f"(stopped early: {result.error})")
 
     shown = present(result)
-    while shown:
+    while shown and (change := ask("\nWant any changes? (describe them, or press Enter to finish) ")):
         try:
-            change = input("\nWant any changes? (describe them, or press Enter to finish) ").strip()
-        except EOFError:
-            break
-        if not change:
-            break
-        try:
-            new = request_change(result, change, on_draft=show)
+            result, applied = request_change(result, change, on_draft=show)
+            if not applied:
+                print("\nI couldn't make that change and keep the story bedtime-ready, so here's the version you had:")
         except RECOVERABLE as e:
             print(f"\nCouldn't apply that change ({e}). Here's the story you had:")
-            present(result)
-            continue
-        if new.status == "passed":
-            result = new
-            present(result)
-        else:
-            # Never trade a story that passed review for one that didn't.
-            print("\nI couldn't make that change and keep the story bedtime-ready, so here's the version you had:")
-            present(result)
+        present(result)
+
+
+def ask(prompt: str) -> str:
+    try:
+        return input(prompt).strip()
+    except EOFError:
+        return ""
 
 
 def present(result) -> bool:
     """Print the story, or a gentle refusal if nothing safe was produced. Returns whether a story was shown."""
-    if result.error:
-        print(f"(stopped early: {result.error})")
     if result.status == "blocked":
         print("\nI couldn't make a story for that one that's gentle enough for bedtime. Try another idea?")
         return False

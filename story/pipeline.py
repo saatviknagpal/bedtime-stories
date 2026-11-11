@@ -133,9 +133,9 @@ def _revise(result: Result, story: str, notes: list[str]) -> str:
     return call_model(REVISER_PROMPT.format(request=esc(result.request), story=esc(story), notes=esc(bullets)), system=result.system)
 
 
-def _write_fresh(result: Result, extra: str = "") -> str:
+def _write_fresh(result: Result) -> str:
     prompt = STORY_PROMPT.format(request=esc(result.request), brief=esc(result.intake.brief))
-    return call_model(prompt, system=result.system + extra)
+    return call_model(prompt, system=result.system)
 
 
 def _write_safe_fallback(result: Result) -> str:
@@ -180,13 +180,15 @@ def tell_story(request: str, age_band: str | None = None, on_draft=lambda d: Non
     return _refine(result, lambda: _write_fresh(result), on_draft)
 
 
-def request_change(previous: Result, change: str, on_draft=lambda d: None) -> Result:
+def request_change(previous: Result, change: str, on_draft=lambda d: None) -> tuple[Result, bool]:
     """Apply a listener's change to the shown story and judge it against the request plus the change.
 
+    Returns (result, applied). The change is applied only if the new story fully passes; otherwise the
+    previous result comes back unchanged, so a story that passed is never swapped for a worse one.
     No safety fallback here: regenerating from the original brief would silently drop the change.
-    Callers should keep the previous story unless the new result passed.
     """
     request = f"{previous.request}\n\nRequested change: {change}"
     result = Result(request, previous.intake, previous.system)
     note = f"The listener asked for this change: {change}"
-    return _refine(result, lambda: _revise(result, previous.best.story, [note]), on_draft, fallback=False)
+    _refine(result, lambda: _revise(result, previous.best.story, [note]), on_draft, fallback=False)
+    return (result, True) if result.status == "passed" else (previous, False)
