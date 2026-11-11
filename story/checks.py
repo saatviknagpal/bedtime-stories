@@ -2,6 +2,7 @@ import re
 
 WORD_RANGE = (400, 800)  # accepted range (~5-10 min read-aloud); the prompt targets 450-650
 MAX_GRADE = {"5-7": 3.0, "8-10": 5.0}  # Flesch-Kincaid grade caps per age band
+MAX_LONG_WORD_SHARE = 0.25  # per paragraph: share of 3+ syllable words
 # Only unambiguous refusals: a match blocks the story. Softer cases ("Sure, here you go") are left to the judge's story_only check.
 META_OPENER = re.compile(
     r"^\W*(i can't|i cannot|i won't|i'm (sorry|not able|unable)|i am (sorry|not able|unable)"
@@ -56,6 +57,12 @@ def run_checks(story: str, age_band: str) -> list[str]:
     grade = fk_grade(body)
     if grade > MAX_GRADE[age_band]:
         failures.append(f"Reading level is grade {grade:.1f}; must be <= {MAX_GRADE[age_band]} for ages {age_band}. Use shorter sentences and simpler words.")
+    # One dense paragraph barely moves the whole-story average, so also check each paragraph's share of long words.
+    # (Per-paragraph grade is too noisy: one long, simple sentence scores grade 9+.)
+    for p in body.split("\n\n"):
+        words = re.findall(r"[A-Za-z']+", p)
+        if len(words) >= 12 and (share := sum(syllables(w) >= 3 for w in words) / len(words)) > MAX_LONG_WORD_SHARE:
+            failures.append(f"The paragraph starting \"{p[:40]}...\" uses too many long words ({share:.0%}); use simpler words.")
     if META_OPENER.match(body):
         failures.append(META_FAILURE)
     return failures

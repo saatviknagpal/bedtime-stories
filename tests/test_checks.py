@@ -29,6 +29,16 @@ class TestChecks(unittest.TestCase):
         hard = "Notwithstanding considerable environmental uncertainties, the extraordinarily meticulous investigators systematically documented unprecedented observations. " * 40
         self.assertTrue(any("Reading level" in f for f in run_checks(hard, "8-10")))
 
+    def test_one_dense_paragraph_fails(self):
+        dense = ("Notwithstanding the considerable atmospheric uncertainty, the extraordinarily meticulous protagonist "
+                 "contemplated the unprecedented ramifications of her circumstances, deliberating methodically.")
+        story = SIMPLE[:1200] + "\n\n" + dense + "\n\n" + SIMPLE[:1200]
+        self.assertTrue(any("long words" in f for f in run_checks(story, "5-7")))
+
+    def test_long_simple_sentence_paragraph_passes(self):
+        line = "And while the moon watched over the house, the sleepy monster snored softly below, and Mila slept warm and calm until morning."
+        self.assertFalse(any("long words" in f for f in run_checks(SIMPLE + "\n\n" + line, "5-7")))
+
     def test_meta_opener_detected(self):
         self.assertTrue(any("talking to the adult" in f for f in run_checks("I can't write that, but here is a cozy story. " + SIMPLE, "5-7")))
 
