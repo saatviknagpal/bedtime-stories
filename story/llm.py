@@ -8,17 +8,27 @@ MODEL = "claude-haiku-5-5"
 client = anthropic.Anthropic()
 
 
-def call_model(prompt: str, system: str | None = None, max_tokens: int = 16000) -> str:
-    kwargs = {"system": system} if system else {}
+class LLMError(RuntimeError):
+    pass
+
+
+def _check_complete(resp) -> None:
+    if resp.stop_reason in ("refusal", "max_tokens"):
+        raise LLMError(f"Incomplete response: {resp.stop_reason} (request {resp._request_id})")
+
+
+def call_model(prompt: str, system: str, max_tokens: int = 16000) -> str:
     resp = client.messages.create(
         model=MODEL,
         max_tokens=max_tokens,
+        system=system,
         messages=[{"role": "user", "content": prompt}],
-        **kwargs,
     )
-    if resp.stop_reason == "refusal":
-        raise RuntimeError(f"Model refused (request {resp._request_id})")
-    return "".join(b.text for b in resp.content if b.type == "text")
+    _check_complete(resp)
+    text = "".join(b.text for b in resp.content if b.type == "text").strip()
+    if not text:
+        raise LLMError(f"Empty response (request {resp._request_id})")
+    return text
 
 
 def call_structured[T: BaseModel](prompt: str, schema: type[T], system: str, max_tokens: int = 16000) -> T:
@@ -29,6 +39,7 @@ def call_structured[T: BaseModel](prompt: str, schema: type[T], system: str, max
         messages=[{"role": "user", "content": prompt}],
         output_format=schema,
     )
-    if resp.stop_reason == "refusal" or resp.parsed_output is None:
-        raise RuntimeError(f"No structured output: {resp.stop_reason} (request {resp._request_id})")
+    _check_complete(resp)
+    if resp.parsed_output is None:
+        raise LLMError(f"No structured output (request {resp._request_id})")
     return resp.parsed_output
