@@ -1,0 +1,54 @@
+@import "tailwindcss";
+
+@theme {
+  --color-night: #0f172a;
+  --color-night-card: #192134;
+  --color-night-line: rgb(255 255 255 / 0.08);
+  --color-muted: #94a3b8;
+  --color-moon: #f5d78e;
+  --color-amber: #f59e0b;
+  --color-paper: #fbf6ec;
+  --color-ink: #2a2620;
+  --color-pass: #4ade80;
+  --color-fail: #fbbf24;
+  --color-block: #f87171;
+  --font-story: var(--font-lora);
+  --font-ui: var(--font-raleway);
+}
+
+body {
+  background:
+    radial-gradient(1200px 600px at 80% -10%, rgb(99 102 241 / 0.18), transparent 60%),
+    radial-gradient(900px 500px at 0% 0%, rgb(245 215 142 / 0.08), transparent 60%),
+    var(--color-night);
+  color: #e2e8f0;
+  font-family: var(--font-ui), system-ui, sans-serif;
+  min-height: 100dvh;
+}
+
+/* Faint star field; static so it never distracts. */
+.stars {
+  background-image:
+    radial-gradient(1px 1px at 20% 30%, #fff8, transparent),
+    radial-gradient(1px 1px at 70% 10%, #fff6, transparent),
+    radial-gradient(1.5px 1.5px at 85% 45%, #fff7, transparent),
+    radial-gradient(1px 1px at 40% 70%, #fff5, transparent),
+    radial-gradient(1px 1px at 10% 85%, #fff6, transparent),
+    radial-gradient(1px 1px at 60% 90%, #fff4, transparent);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-moon);
+  outline-offset: 2px;
+}
+
+@keyframes rise {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: none; }
+}
+.rise { animation: rise 300ms ease-out both; }
+
+@media (prefers-reduced-motion: reduce) {
+  .rise { animation: none; }
+  * { transition: none !important; }
+}
