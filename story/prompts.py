@@ -23,6 +23,8 @@ Output only the title on the first line, then the story. Never address the paren
 
 STORY_PROMPT = "<request>\n{request}\n</request>\n\n<brief>\n{brief}\n</brief>"
 
+FALLBACK_PROMPT = "<brief>\n{brief}\n</brief>"
+
 EXTRA_GENTLE = "\n\nThe previous attempt was not safe for a young child. Make this version extra gentle: no conflict beyond a small, cozy problem, and nothing that could frighten a child."
 
 JUDGE_SYSTEM = """You are a strict children's librarian reviewing a bedtime story before it is read to a child aged {age_band}. You did not write this story. Most first drafts have at least one problem; look for it.

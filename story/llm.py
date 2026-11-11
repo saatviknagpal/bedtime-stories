@@ -13,7 +13,8 @@ class LLMError(RuntimeError):
 
 
 def _check_complete(resp) -> None:
-    if resp.stop_reason in ("refusal", "max_tokens"):
+    # Only a normal finish counts; refusal, max_tokens, or anything unexpected is incomplete.
+    if resp.stop_reason != "end_turn":
         raise LLMError(f"Incomplete response: {resp.stop_reason} (request {resp._request_id})")
 
 

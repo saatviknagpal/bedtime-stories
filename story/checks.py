@@ -13,10 +13,15 @@ def _normalize(text: str) -> str:
     return text.replace("’", "'").replace("‘", "'")
 
 
+META_FAILURE = "Starts by talking to the adult instead of telling the story. Output only the title and story."
+
+
 def split_title(story: str) -> tuple[str, str]:
     """The storyteller puts the title on the first line; grade and count only the body."""
     lines = _normalize(story).strip().splitlines()
-    if len(lines) > 1 and len(lines[0].split()) <= 12:
+    first = lines[0] if lines else ""
+    looks_like_refusal = META_OPENER.match(first) and re.search(r"[.!?:,]\W*$", first)  # titles rarely end like a sentence
+    if len(lines) > 1 and len(first.split()) <= 12 and not looks_like_refusal:
         return lines[0], "\n".join(lines[1:]).strip()
     return "", "\n".join(lines)
 
@@ -51,5 +56,5 @@ def run_checks(story: str, age_band: str) -> list[str]:
     if grade > MAX_GRADE[age_band]:
         failures.append(f"Reading level is grade {grade:.1f}; must be <= {MAX_GRADE[age_band]} for ages {age_band}. Use shorter sentences and simpler words.")
     if META_OPENER.match(body):
-        failures.append("Starts by talking to the adult instead of telling the story. Output only the title and story.")
+        failures.append(META_FAILURE)
     return failures

@@ -4,11 +4,12 @@ from typing import Literal
 import anthropic
 from pydantic import BaseModel, Field, ValidationError
 
-from story.checks import run_checks
+from story.checks import META_FAILURE, run_checks
 from story.llm import LLMError, call_model, call_structured
 from story.prompts import (
     CATEGORY_GUIDES,
     EXTRA_GENTLE,
+    FALLBACK_PROMPT,
     INTAKE_PROMPT,
     INTAKE_SYSTEM,
     JUDGE_PROMPT,
@@ -74,7 +75,7 @@ class Draft:
 
     @property
     def blocked(self) -> bool:
-        return any(c in BLOCKING for c in self.failed_checks)
+        return any(c in BLOCKING for c in self.failed_checks) or META_FAILURE in self.code_failures
 
     @property
     def passed(self) -> bool:
@@ -113,9 +114,14 @@ class Result:
         return "passed" if best.passed else "flagged"
 
 
+def esc(text: str) -> str:
+    """Keep untrusted text from closing or opening prompt tags."""
+    return text.replace("<", "&lt;").replace(">", "&gt;")
+
+
 def judge(request: str, story: str, intake: Intake) -> Draft:
     verdict = call_structured(
-        JUDGE_PROMPT.format(request=request, story=story),
+        JUDGE_PROMPT.format(request=esc(request), story=esc(story)),
         Verdict,
         system=JUDGE_SYSTEM.format(age_band=intake.age_band),
     )
@@ -124,10 +130,20 @@ def judge(request: str, story: str, intake: Intake) -> Draft:
 
 def _revise(result: Result, story: str, notes: list[str]) -> str:
     bullets = "\n".join(f"- {n}" for n in notes)
-    return call_model(REVISER_PROMPT.format(request=result.request, story=story, notes=bullets), system=result.system)
+    return call_model(REVISER_PROMPT.format(request=esc(result.request), story=esc(story), notes=esc(bullets)), system=result.system)
 
 
-def _refine(result: Result, write_first, on_draft) -> Result:
+def _write_fresh(result: Result, extra: str = "") -> str:
+    prompt = STORY_PROMPT.format(request=esc(result.request), brief=esc(result.intake.brief))
+    return call_model(prompt, system=result.system + extra)
+
+
+def _write_safe_fallback(result: Result) -> str:
+    # Only the softened brief: the raw request may be what made earlier drafts unsafe.
+    return call_model(FALLBACK_PROMPT.format(brief=esc(result.intake.brief)), system=result.system + EXTRA_GENTLE)
+
+
+def _refine(result: Result, write_first, on_draft, fallback: bool = True) -> Result:
     """Judge a first draft, revise until it passes (bounded), then apply the safety fallback."""
 
     def add(story: str) -> Draft:
@@ -142,28 +158,35 @@ def _refine(result: Result, write_first, on_draft) -> Result:
             if draft.passed:
                 break
             draft = add(_revise(result, draft.story, draft.notes))
-        if result.best.blocked:
-            # Safety fallback: one fresh, extra-gentle attempt from the softened brief.
-            brief = STORY_PROMPT.format(request=result.request, brief=result.intake.brief)
-            add(call_model(brief, system=result.system + EXTRA_GENTLE))
     except RECOVERABLE as e:
         if not result.drafts:
             raise
         result.error = str(e)  # keep earlier drafts; best/status still work
+    if fallback and result.best.blocked:
+        # Safety fallback: one fresh, extra-gentle attempt from the softened brief.
+        try:
+            add(_write_safe_fallback(result))
+        except RECOVERABLE as e:
+            result.error = str(e)
     return result
 
 
 def tell_story(request: str, age_band: str | None = None, on_draft=lambda d: None) -> Result:
-    intake = call_structured(INTAKE_PROMPT.format(request=request), Intake, system=INTAKE_SYSTEM)
+    intake = call_structured(INTAKE_PROMPT.format(request=esc(request)), Intake, system=INTAKE_SYSTEM)
     if age_band:
         intake.age_band = age_band
     system = STORYTELLER_SYSTEM.format(age_band=intake.age_band) + "\n\nGenre guidance: " + CATEGORY_GUIDES[intake.category]
     result = Result(request, intake, system)
-    return _refine(result, lambda: call_model(STORY_PROMPT.format(request=request, brief=intake.brief), system=system), on_draft)
+    return _refine(result, lambda: _write_fresh(result), on_draft)
 
 
 def request_change(previous: Result, change: str, on_draft=lambda d: None) -> Result:
-    """Apply a listener's change request to the shown story, then run it through the same judge loop."""
-    result = Result(previous.request, previous.intake, previous.system)
+    """Apply a listener's change to the shown story and judge it against the request plus the change.
+
+    No safety fallback here: regenerating from the original brief would silently drop the change.
+    Callers should keep the previous story unless the new result passed.
+    """
+    request = f"{previous.request}\n\nRequested change: {change}"
+    result = Result(request, previous.intake, previous.system)
     note = f"The listener asked for this change: {change}"
-    return _refine(result, lambda: _revise(result, previous.best.story, [note]), on_draft)
+    return _refine(result, lambda: _revise(result, previous.best.story, [note]), on_draft, fallback=False)

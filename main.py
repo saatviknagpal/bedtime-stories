@@ -1,10 +1,7 @@
 import argparse
 import sys
 
-import anthropic
-
-from story.llm import LLMError
-from story.pipeline import CHECKS, Draft, request_change, tell_story
+from story.pipeline import CHECKS, RECOVERABLE, Draft, request_change, tell_story
 
 """
 Before submitting the assignment, describe here in a few sentences what you would have built next if you spent 2 more hours on this project:
@@ -39,18 +36,30 @@ def main():
     try:
         result = tell_story(request, args.age, on_draft=show)
         print(f"\n[{result.intake.category}, ages {result.intake.age_band}] {result.intake.brief}")
-        while present(result):
-            change = input("\nWant any changes? (describe them, or press Enter to finish) ").strip()
-            if not change:
-                break
-            new = request_change(result, change, on_draft=show)
-            if new.status == "blocked":
-                print("\nThat change made the story too intense for bedtime, so here's the previous version.")
-                present(result)
-            else:
-                result = new
-    except (LLMError, anthropic.APIError) as e:
+    except RECOVERABLE as e:
         sys.exit(f"Could not create a story: {e}")
+
+    shown = present(result)
+    while shown:
+        try:
+            change = input("\nWant any changes? (describe them, or press Enter to finish) ").strip()
+        except EOFError:
+            break
+        if not change:
+            break
+        try:
+            new = request_change(result, change, on_draft=show)
+        except RECOVERABLE as e:
+            print(f"\nCouldn't apply that change ({e}). Here's the story you had:")
+            present(result)
+            continue
+        if new.status == "passed":
+            result = new
+            present(result)
+        else:
+            # Never trade a story that passed review for one that didn't.
+            print("\nI couldn't make that change and keep the story bedtime-ready, so here's the version you had:")
+            present(result)
 
 
 def present(result) -> bool:

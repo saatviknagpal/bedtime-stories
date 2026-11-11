@@ -36,6 +36,10 @@ class TestChecks(unittest.TestCase):
         story = "**Sleepy Cat**\n\nI cannot write that. " + SIMPLE
         self.assertTrue(any("talking to the adult" in f for f in run_checks(story, "5-7")))
 
+    def test_short_refusal_line_not_mistaken_for_title(self):
+        story = "I can't write that.\n\n" + SIMPLE
+        self.assertTrue(any("talking to the adult" in f for f in run_checks(story, "5-7")))
+
     def test_curly_apostrophe_refusal_detected(self):
         self.assertTrue(any("talking to the adult" in f for f in run_checks("I can’t do that. " + SIMPLE, "5-7")))
 
