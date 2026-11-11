@@ -98,6 +98,7 @@ class Result:
     system: str
     drafts: list[Draft] = field(default_factory=list)
     error: str | None = None
+    on_text: object = None  # optional streaming callback for story text
 
     @property
     def best(self) -> Draft | None:
@@ -130,17 +131,19 @@ def judge(request: str, story: str, intake: Intake) -> Draft:
 
 def _revise(result: Result, story: str, notes: list[str]) -> str:
     bullets = "\n".join(f"- {n}" for n in notes)
-    return call_model(REVISER_PROMPT.format(request=esc(result.request), story=esc(story), notes=esc(bullets)), system=result.system)
+    prompt = REVISER_PROMPT.format(request=esc(result.request), story=esc(story), notes=esc(bullets))
+    return call_model(prompt, system=result.system, on_text=result.on_text)
 
 
 def _write_fresh(result: Result) -> str:
     prompt = STORY_PROMPT.format(request=esc(result.request), brief=esc(result.intake.brief))
-    return call_model(prompt, system=result.system)
+    return call_model(prompt, system=result.system, on_text=result.on_text)
 
 
 def _write_safe_fallback(result: Result) -> str:
     # Only the softened brief: the raw request may be what made earlier drafts unsafe.
-    return call_model(FALLBACK_PROMPT.format(brief=esc(result.intake.brief)), system=result.system + EXTRA_GENTLE)
+    prompt = FALLBACK_PROMPT.format(brief=esc(result.intake.brief))
+    return call_model(prompt, system=result.system + EXTRA_GENTLE, on_text=result.on_text)
 
 
 def _refine(result: Result, write_first, on_draft, fallback: bool = True) -> Result:
@@ -171,24 +174,39 @@ def _refine(result: Result, write_first, on_draft, fallback: bool = True) -> Res
     return result
 
 
-def tell_story(request: str, age_band: str | None = None, on_draft=lambda d: None) -> Result:
+def system_for(intake: Intake) -> str:
+    return STORYTELLER_SYSTEM.format(age_band=intake.age_band) + "\n\nGenre guidance: " + CATEGORY_GUIDES[intake.category]
+
+
+def read_request(request: str, age_band: str | None = None) -> Intake:
     intake = call_structured(INTAKE_PROMPT.format(request=esc(request)), Intake, system=INTAKE_SYSTEM)
     if age_band:
         intake.age_band = age_band
-    system = STORYTELLER_SYSTEM.format(age_band=intake.age_band) + "\n\nGenre guidance: " + CATEGORY_GUIDES[intake.category]
-    result = Result(request, intake, system)
+    return intake
+
+
+def tell_story(request: str, age_band: str | None = None, on_draft=lambda d: None, on_text=None,
+               intake: Intake | None = None) -> Result:
+    """Full pipeline. `on_text` streams story words as they are written; a new draft starts after each on_draft."""
+    intake = intake or read_request(request, age_band)
+    result = Result(request, intake, system_for(intake), on_text=on_text)
     return _refine(result, lambda: _write_fresh(result), on_draft)
 
 
-def request_change(previous: Result, change: str, on_draft=lambda d: None) -> tuple[Result, bool]:
-    """Apply a listener's change to the shown story and judge it against the request plus the change.
+def change_story(request: str, intake: Intake, story: str, change: str, on_draft=lambda d: None, on_text=None) -> Result | None:
+    """Apply a listener's change to `story` and judge it against the request plus the change.
 
-    Returns (result, applied). The change is applied only if the new story fully passes; otherwise the
-    previous result comes back unchanged, so a story that passed is never swapped for a worse one.
-    No safety fallback here: regenerating from the original brief would silently drop the change.
+    Returns the new result only if it fully passes; None means keep the story you have, so a story that passed
+    is never swapped for a worse one. No safety fallback: regenerating from the brief would drop the change.
+    Takes plain values so a stateless API can call it.
     """
-    request = f"{previous.request}\n\nRequested change: {change}"
-    result = Result(request, previous.intake, previous.system)
+    result = Result(f"{request}\n\nRequested change: {change}", intake, system_for(intake), on_text=on_text)
     note = f"The listener asked for this change: {change}"
-    _refine(result, lambda: _revise(result, previous.best.story, [note]), on_draft, fallback=False)
-    return (result, True) if result.status == "passed" else (previous, False)
+    _refine(result, lambda: _revise(result, story, [note]), on_draft, fallback=False)
+    return result if result.status == "passed" else None
+
+
+def request_change(previous: Result, change: str, on_draft=lambda d: None) -> tuple[Result, bool]:
+    """CLI helper: returns (result, applied), keeping `previous` when the change did not pass."""
+    new = change_story(previous.request, previous.intake, previous.best.story, change, on_draft)
+    return (new, True) if new else (previous, False)

@@ -29,7 +29,7 @@ def run(verdicts, category="animals", story=GOOD_STORY, model_error_at=None, req
             raise item
         return item
 
-    def fake_model(prompt, system):
+    def fake_model(prompt, system, on_text=None):
         calls["model"] += 1
         calls["prompts"].append(prompt)
         calls["systems"].append(system)
@@ -131,7 +131,7 @@ class TestPipeline(unittest.TestCase):
         verdicts = [verdict()]
         prompts = []
 
-        def fake_model(prompt, system):
+        def fake_model(prompt, system, on_text=None):
             prompts.append(prompt)
             return GOOD_STORY
 
@@ -152,7 +152,7 @@ class TestPipeline(unittest.TestCase):
         first, _ = run([verdict()])
         flagged = [verdict(fail=["calm_ending"])] * 3
         with patch("story.pipeline.call_structured", lambda p, s, system: flagged.pop(0)), \
-                patch("story.pipeline.call_model", lambda prompt, system: "A worse story."):
+                patch("story.pipeline.call_model", lambda prompt, system, on_text=None: "A worse story."):
             kept, applied = request_change(first, "add a dragon")
         self.assertFalse(applied)
         self.assertIs(kept, first)
@@ -162,7 +162,7 @@ class TestPipeline(unittest.TestCase):
         first, _ = run([verdict()])
         prompts = []
 
-        def fake_model(prompt, system):
+        def fake_model(prompt, system, on_text=None):
             prompts.append(system)
             return GOOD_STORY
 

@@ -1,0 +1,38 @@
+[
+  {
+    "case": "dragon",
+    "kind": "normal",
+    "status": "passed",
+    "outcome": "win"
+  },
+  {
+    "case": "moon_dog",
+    "kind": "normal",
+    "status": "passed",
+    "outcome": "tie"
+  },
+  {
+    "case": "first_day",
+    "kind": "normal",
+    "status": "passed",
+    "outcome": "win"
+  },
+  {
+    "case": "one_word",
+    "kind": "tricky",
+    "status": "passed",
+    "outcome": "win"
+  },
+  {
+    "case": "zombies",
+    "kind": "unsafe",
+    "status": "passed",
+    "outcome": "win"
+  },
+  {
+    "case": "new_sibling",
+    "kind": "comfort",
+    "status": "passed",
+    "outcome": "win"
+  }
+]

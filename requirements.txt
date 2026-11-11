@@ -1,3 +1,6 @@
 anthropic>=2.8
 pydantic>=2.14
 python-dotenv>=1.0
+fastapi>=0.162
+uvicorn>=0.54
+httpx>=0.28  # tests (FastAPI TestClient)
