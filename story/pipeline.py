@@ -92,7 +92,9 @@ class Draft:
 
 @dataclass
 class Result:
+    request: str
     intake: Intake
+    system: str
     drafts: list[Draft] = field(default_factory=list)
     error: str | None = None
 
@@ -120,31 +122,48 @@ def judge(request: str, story: str, intake: Intake) -> Draft:
     return Draft(story, verdict, run_checks(story, intake.age_band), intake.category)
 
 
-def tell_story(request: str, age_band: str | None = None, on_draft=lambda d: None) -> Result:
-    intake = call_structured(INTAKE_PROMPT.format(request=request), Intake, system=INTAKE_SYSTEM)
-    if age_band:
-        intake.age_band = age_band
-    system = STORYTELLER_SYSTEM.format(age_band=intake.age_band) + "\n\nGenre guidance: " + CATEGORY_GUIDES[intake.category]
-    result = Result(intake)
+def _revise(result: Result, story: str, notes: list[str]) -> str:
+    bullets = "\n".join(f"- {n}" for n in notes)
+    return call_model(REVISER_PROMPT.format(request=result.request, story=story, notes=bullets), system=result.system)
+
+
+def _refine(result: Result, write_first, on_draft) -> Result:
+    """Judge a first draft, revise until it passes (bounded), then apply the safety fallback."""
 
     def add(story: str) -> Draft:
-        draft = judge(request, story, intake)
+        draft = judge(result.request, story, result.intake)
         result.drafts.append(draft)
         on_draft(draft)
         return draft
 
     try:
-        draft = add(call_model(STORY_PROMPT.format(request=request, brief=intake.brief), system=system))
+        draft = add(write_first())
         for _ in range(MAX_REVISIONS):
             if draft.passed:
                 break
-            notes = "\n".join(f"- {n}" for n in draft.notes)
-            draft = add(call_model(REVISER_PROMPT.format(request=request, story=draft.story, notes=notes), system=system))
+            draft = add(_revise(result, draft.story, draft.notes))
         if result.best.blocked:
             # Safety fallback: one fresh, extra-gentle attempt from the softened brief.
-            add(call_model(STORY_PROMPT.format(request=request, brief=intake.brief), system=system + EXTRA_GENTLE))
+            brief = STORY_PROMPT.format(request=result.request, brief=result.intake.brief)
+            add(call_model(brief, system=result.system + EXTRA_GENTLE))
     except RECOVERABLE as e:
         if not result.drafts:
             raise
         result.error = str(e)  # keep earlier drafts; best/status still work
     return result
+
+
+def tell_story(request: str, age_band: str | None = None, on_draft=lambda d: None) -> Result:
+    intake = call_structured(INTAKE_PROMPT.format(request=request), Intake, system=INTAKE_SYSTEM)
+    if age_band:
+        intake.age_band = age_band
+    system = STORYTELLER_SYSTEM.format(age_band=intake.age_band) + "\n\nGenre guidance: " + CATEGORY_GUIDES[intake.category]
+    result = Result(request, intake, system)
+    return _refine(result, lambda: call_model(STORY_PROMPT.format(request=request, brief=intake.brief), system=system), on_draft)
+
+
+def request_change(previous: Result, change: str, on_draft=lambda d: None) -> Result:
+    """Apply a listener's change request to the shown story, then run it through the same judge loop."""
+    result = Result(previous.request, previous.intake, previous.system)
+    note = f"The listener asked for this change: {change}"
+    return _refine(result, lambda: _revise(result, previous.best.story, [note]), on_draft)

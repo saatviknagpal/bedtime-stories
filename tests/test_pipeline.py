@@ -4,7 +4,7 @@ from unittest.mock import patch
 from pydantic import ValidationError
 
 from story.llm import LLMError
-from story.pipeline import CHECKS, Intake, Verdict, tell_story
+from story.pipeline import CHECKS, Intake, Verdict, request_change, tell_story
 
 GOOD_STORY = "Sleepy Cat\n\n" + "The cat sat on the mat. The cat was warm. The cat went to sleep. " * 40
 
@@ -89,6 +89,21 @@ class TestPipeline(unittest.TestCase):
     def test_error_before_any_draft_raises(self):
         with self.assertRaises(LLMError):
             run([], model_error_at=1)
+
+    def test_change_request_reaches_reviser_and_is_judged(self):
+        first, _ = run([verdict()])
+        verdicts = [verdict()]
+        prompts = []
+
+        def fake_model(prompt, system):
+            prompts.append(prompt)
+            return GOOD_STORY
+
+        with patch("story.pipeline.call_structured", lambda p, s, system: verdicts.pop(0)), patch("story.pipeline.call_model", fake_model):
+            changed = request_change(first, "add a dog named Rex")
+        self.assertIn("add a dog named Rex", prompts[0])
+        self.assertEqual(changed.status, "passed")
+        self.assertEqual(changed.request, first.request)
 
     def test_out_of_range_score_rejected(self):
         with self.assertRaises(ValidationError):

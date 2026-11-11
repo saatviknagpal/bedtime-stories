@@ -4,7 +4,7 @@ import sys
 import anthropic
 
 from story.llm import LLMError
-from story.pipeline import CHECKS, Draft, tell_story
+from story.pipeline import CHECKS, Draft, request_change, tell_story
 
 """
 Before submitting the assignment, describe here in a few sentences what you would have built next if you spent 2 more hours on this project:
@@ -38,17 +38,32 @@ def main():
 
     try:
         result = tell_story(request, args.age, on_draft=show)
+        print(f"\n[{result.intake.category}, ages {result.intake.age_band}] {result.intake.brief}")
+        while present(result):
+            change = input("\nWant any changes? (describe them, or press Enter to finish) ").strip()
+            if not change:
+                break
+            new = request_change(result, change, on_draft=show)
+            if new.status == "blocked":
+                print("\nThat change made the story too intense for bedtime, so here's the previous version.")
+                present(result)
+            else:
+                result = new
     except (LLMError, anthropic.APIError) as e:
         sys.exit(f"Could not create a story: {e}")
 
-    print(f"\n[{result.intake.category}, ages {result.intake.age_band}] {result.intake.brief}")
+
+def present(result) -> bool:
+    """Print the story, or a gentle refusal if nothing safe was produced. Returns whether a story was shown."""
     if result.error:
         print(f"(stopped early: {result.error})")
     if result.status == "blocked":
-        sys.exit("\nI couldn't make a story for that one that's gentle enough for bedtime. Try another idea?")
+        print("\nI couldn't make a story for that one that's gentle enough for bedtime. Try another idea?")
+        return False
     if result.status == "flagged":
         print("\n(Note: this story didn't fully pass review.)")
     print("\n" + result.best.story)
+    return True
 
 
 if __name__ == "__main__":
