@@ -1,14 +1,30 @@
 from dataclasses import dataclass, field
+from typing import Literal
 
 from pydantic import BaseModel
 
 from story.checks import run_checks
 from story.llm import call_model, call_structured
-from story.prompts import JUDGE_PROMPT, JUDGE_SYSTEM, REVISER_PROMPT, STORY_PROMPT, STORYTELLER_SYSTEM
+from story.prompts import (
+    CATEGORY_GUIDES,
+    INTAKE_SYSTEM,
+    JUDGE_PROMPT,
+    JUDGE_SYSTEM,
+    REVISER_PROMPT,
+    STORY_PROMPT,
+    STORYTELLER_SYSTEM,
+)
 
 MAX_REVISIONS = 2
 MIN_SCORE = 4
 CHECKS = ("safe", "follows_request", "clear_arc", "single_thread", "calm_ending", "story_only")
+
+
+class Intake(BaseModel):
+    age_band: Literal["5-7", "8-10"]
+    category: Literal["adventure", "friendship", "animals", "funny", "fantasy", "comfort", "everyday"]
+    characters: list[str]
+    brief: str
 
 
 class Check(BaseModel):
@@ -50,6 +66,7 @@ class Draft:
 
 @dataclass
 class Result:
+    intake: Intake
     drafts: list[Draft] = field(default_factory=list)
 
     @property
@@ -68,10 +85,14 @@ def judge(request: str, story: str, age_band: str) -> Draft:
     return Draft(story, verdict, run_checks(story, age_band))
 
 
-def tell_story(request: str, age_band: str = "5-7", on_draft=lambda d: None) -> Result:
-    system = STORYTELLER_SYSTEM.format(age_band=age_band)
-    result = Result()
-    story = call_model(STORY_PROMPT.format(request=request), system=system)
+def tell_story(request: str, age_band: str | None = None, on_draft=lambda d: None) -> Result:
+    intake = call_structured(request, Intake, system=INTAKE_SYSTEM)
+    if age_band:
+        intake.age_band = age_band
+    age_band = intake.age_band
+    system = STORYTELLER_SYSTEM.format(age_band=age_band) + "\n\nGenre guidance: " + CATEGORY_GUIDES[intake.category]
+    result = Result(intake)
+    story = call_model(STORY_PROMPT.format(request=request, brief=intake.brief), system=system)
     for round_ in range(MAX_REVISIONS + 1):
         draft = judge(request, story, age_band)
         result.drafts.append(draft)

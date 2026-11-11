@@ -23,10 +23,11 @@ def show(draft: Draft) -> None:
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--age", choices=["5-7", "8-10"], default="5-7")
+    parser.add_argument("--age", choices=["5-7", "8-10"], help="override the age band inferred from the request")
     args = parser.parse_args()
     user_input = input("What kind of story do you want to hear? ") or example_requests
     result = tell_story(user_input, args.age, on_draft=show)
+    print(f"\n[{result.intake.category}, ages {result.intake.age_band}] {result.intake.brief}")
     print("\n" + result.best.story)
 
 
