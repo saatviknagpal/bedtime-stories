@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import Literal
+from typing import Callable, Literal
 
 import anthropic
 from pydantic import BaseModel, Field, ValidationError
@@ -98,7 +98,7 @@ class Result:
     system: str
     drafts: list[Draft] = field(default_factory=list)
     error: str | None = None
-    on_text: object = None  # optional streaming callback for story text
+    on_stage: Callable[[str], None] = lambda stage: None  # progress: writing / reviewing / revising / gentle_retry
 
     @property
     def best(self) -> Draft | None:
@@ -132,34 +132,37 @@ def judge(request: str, story: str, intake: Intake) -> Draft:
 def _revise(result: Result, story: str, notes: list[str]) -> str:
     bullets = "\n".join(f"- {n}" for n in notes)
     prompt = REVISER_PROMPT.format(request=esc(result.request), story=esc(story), notes=esc(bullets))
-    return call_model(prompt, system=result.system, on_text=result.on_text)
+    return call_model(prompt, system=result.system)
 
 
 def _write_fresh(result: Result) -> str:
     prompt = STORY_PROMPT.format(request=esc(result.request), brief=esc(result.intake.brief))
-    return call_model(prompt, system=result.system, on_text=result.on_text)
+    return call_model(prompt, system=result.system)
 
 
 def _write_safe_fallback(result: Result) -> str:
     # Only the softened brief: the raw request may be what made earlier drafts unsafe.
     prompt = FALLBACK_PROMPT.format(brief=esc(result.intake.brief))
-    return call_model(prompt, system=result.system + EXTRA_GENTLE, on_text=result.on_text)
+    return call_model(prompt, system=result.system + EXTRA_GENTLE)
 
 
 def _refine(result: Result, write_first, on_draft, fallback: bool = True) -> Result:
     """Judge a first draft, revise until it passes (bounded), then apply the safety fallback."""
 
     def add(story: str) -> Draft:
+        result.on_stage("reviewing")
         draft = judge(result.request, story, result.intake)
         result.drafts.append(draft)
         on_draft(draft)
         return draft
 
     try:
+        result.on_stage("writing")
         draft = add(write_first())
         for _ in range(MAX_REVISIONS):
             if draft.passed:
                 break
+            result.on_stage("revising")
             draft = add(_revise(result, draft.story, draft.notes))
     except RECOVERABLE as e:
         if not result.drafts:
@@ -168,6 +171,7 @@ def _refine(result: Result, write_first, on_draft, fallback: bool = True) -> Res
     if fallback and result.best.blocked:
         # Safety fallback: one fresh, extra-gentle attempt from the softened brief.
         try:
+            result.on_stage("gentle_retry")
             add(_write_safe_fallback(result))
         except RECOVERABLE as e:
             result.error = str(e)
@@ -185,22 +189,23 @@ def read_request(request: str, age_band: str | None = None) -> Intake:
     return intake
 
 
-def tell_story(request: str, age_band: str | None = None, on_draft=lambda d: None, on_text=None,
+def tell_story(request: str, age_band: str | None = None, on_draft=lambda d: None, on_stage=lambda s: None,
                intake: Intake | None = None) -> Result:
-    """Full pipeline. `on_text` streams story words as they are written; a new draft starts after each on_draft."""
+    """Full pipeline. `on_stage` reports progress; `on_draft` fires after each draft is judged."""
     intake = intake or read_request(request, age_band)
-    result = Result(request, intake, system_for(intake), on_text=on_text)
+    result = Result(request, intake, system_for(intake), on_stage=on_stage)
     return _refine(result, lambda: _write_fresh(result), on_draft)
 
 
-def change_story(request: str, intake: Intake, story: str, change: str, on_draft=lambda d: None, on_text=None) -> Result | None:
+def change_story(request: str, intake: Intake, story: str, change: str, on_draft=lambda d: None,
+                 on_stage=lambda s: None) -> Result | None:
     """Apply a listener's change to `story` and judge it against the request plus the change.
 
     Returns the new result only if it fully passes; None means keep the story you have, so a story that passed
     is never swapped for a worse one. No safety fallback: regenerating from the brief would drop the change.
     Takes plain values so a stateless API can call it.
     """
-    result = Result(f"{request}\n\nRequested change: {change}", intake, system_for(intake), on_text=on_text)
+    result = Result(f"{request}\n\nRequested change: {change}", intake, system_for(intake), on_stage=on_stage)
     note = f"The listener asked for this change: {change}"
     _refine(result, lambda: _revise(result, story, [note]), on_draft, fallback=False)
     return result if result.status == "passed" else None

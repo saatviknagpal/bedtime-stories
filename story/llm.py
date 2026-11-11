@@ -27,16 +27,13 @@ def _check_complete(resp) -> None:
         raise LLMError(f"Incomplete response: {resp.stop_reason} (request {resp._request_id})")
 
 
-def call_model(prompt: str, system: str, max_tokens: int = 16000, on_text=None) -> str:
-    """Return the model's text. With `on_text`, stream it and call on_text(chunk) as words arrive."""
-    kwargs = dict(model=MODEL, max_tokens=max_tokens, system=system, messages=[{"role": "user", "content": prompt}])
-    if on_text:
-        with client.messages.stream(**kwargs) as stream:
-            for chunk in stream.text_stream:
-                on_text(chunk)
-            resp = stream.get_final_message()
-    else:
-        resp = client.messages.create(**kwargs)
+def call_model(prompt: str, system: str, max_tokens: int = 16000) -> str:
+    resp = client.messages.create(
+        model=MODEL,
+        max_tokens=max_tokens,
+        system=system,
+        messages=[{"role": "user", "content": prompt}],
+    )
     _check_complete(resp)
     text = "".join(b.text for b in resp.content if b.type == "text").strip()
     if not text:

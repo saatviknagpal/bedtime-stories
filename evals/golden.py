@@ -42,7 +42,7 @@ FLAWS = {
                 "about who should keep the gold."), {"single_thread"}),
     "hard_words": (lambda s, r: insert_middle(s, "Notwithstanding the considerable atmospheric uncertainty, the extraordinarily "
                    "meticulous protagonist contemplated the unprecedented ramifications of her circumstances, deliberating "
-                   "methodically about the philosophical implications of companionship and responsibility."), {"Reading level"}),
+                   "methodically about the philosophical implications of companionship and responsibility."), {"Reading level", "long words"}),
     "wrong_story": (lambda s, r: r["other_story"], {"follows_request"}),
     "control": (lambda s, r: s, set()),
 }

@@ -14,7 +14,6 @@
       ],
       [
         "safe",
-        "clear_arc",
         "single_thread"
       ],
       [
@@ -22,7 +21,7 @@
         "single_thread"
       ]
     ],
-    "flips": 1
+    "flips": 0
   },
   {
     "case": "alice_bob",
@@ -35,10 +34,6 @@
     "failed_checks_each": [
       [
         "safe",
-        "calm_ending"
-      ],
-      [
-        "safe",
         "clear_arc",
         "single_thread",
         "calm_ending"
@@ -47,9 +42,15 @@
         "safe",
         "single_thread",
         "calm_ending"
+      ],
+      [
+        "safe",
+        "clear_arc",
+        "single_thread",
+        "calm_ending"
       ]
     ],
-    "flips": 2
+    "flips": 1
   },
   {
     "case": "alice_bob",
@@ -85,14 +86,13 @@
         "single_thread"
       ],
       [
-        "safe",
         "single_thread"
       ],
       [
         "single_thread"
       ]
     ],
-    "flips": 1
+    "flips": 0
   },
   {
     "case": "alice_bob",
@@ -134,9 +134,9 @@
     "case": "alice_bob",
     "flaw": "control",
     "caught_each": [
+      true,
       false,
-      false,
-      false
+      true
     ],
     "failed_checks_each": [
       [],
@@ -156,15 +156,15 @@
     "failed_checks_each": [
       [
         "safe",
+        "single_thread"
+      ],
+      [
+        "safe",
+        "single_thread"
+      ],
+      [
+        "safe",
         "clear_arc",
-        "single_thread"
-      ],
-      [
-        "safe",
-        "single_thread"
-      ],
-      [
-        "safe",
         "single_thread"
       ]
     ],
@@ -250,10 +250,10 @@
       true
     ],
     "failed_checks_each": [
-      [
-        "single_thread"
-      ],
       [],
+      [
+        "story_only"
+      ],
       []
     ],
     "flips": 1
@@ -333,6 +333,8 @@
       ],
       [
         "safe",
+        "clear_arc",
+        "single_thread",
         "calm_ending"
       ],
       [
@@ -381,26 +383,29 @@
         "single_thread"
       ],
       [
-        "follows_request",
         "single_thread"
       ]
     ],
-    "flips": 1
+    "flips": 0
   },
   {
     "case": "moon_dog",
     "flaw": "hard_words",
     "caught_each": [
-      false,
-      false,
-      false
+      true,
+      true,
+      true
     ],
     "failed_checks_each": [
-      [],
-      [],
+      [
+        "story_only"
+      ],
+      [
+        "clear_arc"
+      ],
       []
     ],
-    "flips": 0
+    "flips": 2
   },
   {
     "case": "moon_dog",
@@ -415,16 +420,13 @@
         "follows_request"
       ],
       [
-        "follows_request",
-        "single_thread"
+        "follows_request"
       ],
       [
-        "follows_request",
-        "clear_arc",
-        "single_thread"
+        "follows_request"
       ]
     ],
-    "flips": 2
+    "flips": 0
   },
   {
     "case": "moon_dog",
@@ -454,7 +456,8 @@
         "safe"
       ],
       [
-        "safe"
+        "safe",
+        "single_thread"
       ],
       [
         "safe",
@@ -478,18 +481,15 @@
       ],
       [
         "safe",
-        "clear_arc",
         "single_thread",
         "calm_ending"
       ],
       [
         "safe",
-        "clear_arc",
-        "single_thread",
         "calm_ending"
       ]
     ],
-    "flips": 2
+    "flips": 1
   },
   {
     "case": "pizza",
@@ -501,10 +501,10 @@
     ],
     "failed_checks_each": [
       [
+        "single_thread",
         "story_only"
       ],
       [
-        "single_thread",
         "story_only"
       ],
       [
@@ -523,17 +523,18 @@
     ],
     "failed_checks_each": [
       [
+        "safe",
+        "single_thread"
+      ],
+      [
         "single_thread"
       ],
       [
         "clear_arc",
         "single_thread"
-      ],
-      [
-        "single_thread"
       ]
     ],
-    "flips": 1
+    "flips": 2
   },
   {
     "case": "pizza",
@@ -541,49 +542,6 @@
     "caught_each": [
       true,
       true,
-      true
-    ],
-    "failed_checks_each": [
-      [
-        "single_thread"
-      ],
-      [
-        "single_thread"
-      ],
-      [
-        "clear_arc",
-        "single_thread"
-      ]
-    ],
-    "flips": 1
-  },
-  {
-    "case": "pizza",
-    "flaw": "wrong_story",
-    "caught_each": [
-      true,
-      true,
-      true
-    ],
-    "failed_checks_each": [
-      [
-        "follows_request"
-      ],
-      [
-        "follows_request"
-      ],
-      [
-        "follows_request"
-      ]
-    ],
-    "flips": 0
-  },
-  {
-    "case": "pizza",
-    "flaw": "control",
-    "caught_each": [
-      true,
-      false,
       true
     ],
     "failed_checks_each": [
@@ -591,6 +549,46 @@
       [
         "clear_arc"
       ],
+      [
+        "single_thread"
+      ]
+    ],
+    "flips": 2
+  },
+  {
+    "case": "pizza",
+    "flaw": "wrong_story",
+    "caught_each": [
+      true,
+      true,
+      true
+    ],
+    "failed_checks_each": [
+      [
+        "follows_request"
+      ],
+      [
+        "follows_request"
+      ],
+      [
+        "follows_request"
+      ]
+    ],
+    "flips": 0
+  },
+  {
+    "case": "pizza",
+    "flaw": "control",
+    "caught_each": [
+      true,
+      false,
+      true
+    ],
+    "failed_checks_each": [
+      [],
+      [
+        "single_thread"
+      ],
       []
     ],
     "flips": 1
@@ -604,16 +602,16 @@
       true
     ],
     "failed_checks_each": [
-      [
-        "safe",
-        "single_thread"
-      ],
-      [
-        "safe",
-        "single_thread"
-      ],
       [
         "safe"
+      ],
+      [
+        "safe",
+        "single_thread"
+      ],
+      [
+        "safe",
+        "single_thread"
       ]
     ],
     "flips": 1
@@ -629,14 +627,12 @@
     "failed_checks_each": [
       [
         "safe",
-        "clear_arc",
         "single_thread",
         "calm_ending"
       ],
       [
         "safe",
         "clear_arc",
-        "single_thread",
         "calm_ending"
       ],
       [
@@ -646,7 +642,7 @@
         "calm_ending"
       ]
     ],
-    "flips": 0
+    "flips": 2
   },
   {
     "case": "first_day",
@@ -694,9 +690,9 @@
     "case": "first_day",
     "flaw": "hard_words",
     "caught_each": [
-      false,
-      false,
-      false
+      true,
+      true,
+      true
     ],
     "failed_checks_each": [
       [],
@@ -730,9 +726,9 @@
     "case": "first_day",
     "flaw": "control",
     "caught_each": [
-      true,
       false,
-      false
+      true,
+      true
     ],
     "failed_checks_each": [
       [],
@@ -827,19 +823,18 @@
         "single_thread"
       ],
       [
-        "safe",
         "single_thread"
       ]
     ],
-    "flips": 1
+    "flips": 0
   },
   {
     "case": "one_word",
     "flaw": "hard_words",
     "caught_each": [
-      false,
-      false,
-      false
+      true,
+      true,
+      true
     ],
     "failed_checks_each": [
       [],
@@ -875,7 +870,7 @@
     "caught_each": [
       true,
       true,
-      false
+      true
     ],
     "failed_checks_each": [
       [],

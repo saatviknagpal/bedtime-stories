@@ -2,3 +2,6 @@
 .venv/
 __pycache__/
 *.pyc
+web/.next/
+web/out/
+web/node_modules/
