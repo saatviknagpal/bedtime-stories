@@ -6,7 +6,8 @@ from story import llm
 
 
 def response(stop_reason, text="A story."):
-    return SimpleNamespace(stop_reason=stop_reason, content=[SimpleNamespace(type="text", text=text)], _request_id="req_test")
+    return SimpleNamespace(stop_reason=stop_reason, content=[SimpleNamespace(type="text", text=text)], _request_id="req_test",
+                           usage=SimpleNamespace(input_tokens=10, output_tokens=5))
 
 
 class TestCallModel(unittest.TestCase):

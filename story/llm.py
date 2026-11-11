@@ -1,3 +1,5 @@
+from collections import Counter
+
 import anthropic
 from dotenv import load_dotenv
 from pydantic import BaseModel
@@ -5,7 +7,13 @@ from pydantic import BaseModel
 load_dotenv()
 
 MODEL = "claude-haiku-5-5"
+PRICE_PER_MTOK = {"input": 0.10, "output": 0.50}  # Haiku 5.5, prompts under 100K tokens
 client = anthropic.Anthropic()
+usage = Counter()  # process-wide token totals, read by evals
+
+
+def cost_usd() -> float:
+    return sum(usage[k] * p for k, p in PRICE_PER_MTOK.items()) / 1e6
 
 
 class LLMError(RuntimeError):
@@ -13,6 +21,7 @@ class LLMError(RuntimeError):
 
 
 def _check_complete(resp) -> None:
+    usage.update(input=resp.usage.input_tokens, output=resp.usage.output_tokens, calls=1)
     # Only a normal finish counts; refusal, max_tokens, or anything unexpected is incomplete.
     if resp.stop_reason != "end_turn":
         raise LLMError(f"Incomplete response: {resp.stop_reason} (request {resp._request_id})")
