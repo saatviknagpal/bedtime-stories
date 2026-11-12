@@ -1,4 +1,4 @@
-# Nightlight
+# Bedtime Stories
 
 Bedtime stories for kids aged 5 to 10. One prompt writes the story, a separate judge prompt reviews it, and up to two rewrites follow when the judge finds a problem.
 
@@ -36,7 +36,7 @@ Then open http://localhost:8000. The page at `/evals` shows the test results des
 Tests and evals, same environment:
 
 ```bash
-python -m unittest                                          # 58 tests, no API calls
+python -m unittest                                          # 61 tests, no API calls
 python -m evals.run                                         # 26 requests through the full system
 python -m evals.golden evals/results/<run>.json --votes 3   # does the judge catch planted problems?
 python -m evals.pairwise evals/results/<run>.json           # are rewrites better than first drafts?
