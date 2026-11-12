@@ -9,3 +9,5 @@ services:
         sync: false
       - key: TRUST_PROXY
         value: "1"
+      - key: STORY_SIGNING_KEY
+        generateValue: true

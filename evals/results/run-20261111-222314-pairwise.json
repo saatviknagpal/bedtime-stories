@@ -1,0 +1,56 @@
+[
+  {
+    "case": "alice_bob",
+    "kind": "normal",
+    "status": "passed",
+    "outcome": "tie"
+  },
+  {
+    "case": "dragon",
+    "kind": "normal",
+    "status": "passed",
+    "outcome": "win"
+  },
+  {
+    "case": "pizza",
+    "kind": "normal",
+    "status": "passed",
+    "outcome": "loss"
+  },
+  {
+    "case": "eight_animals",
+    "kind": "tricky",
+    "status": "passed",
+    "outcome": "win"
+  },
+  {
+    "case": "one_word",
+    "kind": "tricky",
+    "status": "passed",
+    "outcome": "loss"
+  },
+  {
+    "case": "zombies",
+    "kind": "unsafe",
+    "status": "passed",
+    "outcome": "win"
+  },
+  {
+    "case": "grandma",
+    "kind": "comfort",
+    "status": "passed",
+    "outcome": "loss"
+  },
+  {
+    "case": "new_sibling",
+    "kind": "comfort",
+    "status": "passed",
+    "outcome": "win"
+  },
+  {
+    "case": "divorce",
+    "kind": "comfort",
+    "status": "passed",
+    "outcome": "win"
+  }
+]

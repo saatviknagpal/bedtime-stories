@@ -18,6 +18,7 @@ import argparse
 import sys
 
 from story.pipeline import CHECKS, RECOVERABLE, Draft, request_change, tell_story
+from story.screening import RequestRejected
 
 example_requests = "A story about a girl named Alice and her best friend Bob, who happens to be a cat."
 
@@ -39,15 +40,18 @@ def main():
     parser.add_argument("--age", choices=["5-7", "8-10"], help="override the age band inferred from the request")
     args = parser.parse_args()
 
-    request = ask("What kind of story do you want to hear? (Enter for an example) ")
-    if not request:
-        request = example_requests
-        print(f"Using example: {request}")
-
-    try:
-        result = tell_story(request, args.age, on_draft=show)
-    except RECOVERABLE as e:
-        sys.exit(f"Could not create a story: {e}")
+    while True:
+        request = ask("What kind of story do you want to hear? (Enter for an example) ")
+        if not request:
+            request = example_requests
+            print(f"Using example: {request}")
+        try:
+            result = tell_story(request, args.age, on_draft=show)
+            break
+        except RequestRejected as e:
+            print(f"\n{e}\n")
+        except RECOVERABLE as e:
+            sys.exit(f"Could not create a story: {e}")
     print(f"\n[{result.intake.category}, ages {result.intake.age_band}] {result.intake.brief}")
     if result.error:
         print(f"(stopped early: {result.error})")
@@ -58,6 +62,8 @@ def main():
             result, applied = request_change(result, change, on_draft=show)
             if not applied:
                 print("\nI couldn't make that change and keep the story bedtime-ready, so here's the version you had:")
+        except RequestRejected as e:
+            print(f"\n{e} Here's the story you had:")
         except RECOVERABLE as e:
             print(f"\nCouldn't apply that change ({e}). Here's the story you had:")
         present(result)

@@ -5,8 +5,11 @@ Story and change endpoints stream Server-Sent Events (SSE): one JSON object per 
 Only reviewed text leaves the server: progress arrives as `stage` events, and a draft that fails a safety
 check is sent without its text. The server keeps no state between requests.
 """
+import hashlib
+import hmac
 import json
 import os
+import secrets
 import queue
 import threading
 import time
@@ -20,6 +23,7 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
 from story.pipeline import CHECKS, Draft, Intake, change_story, read_request, tell_story
+from story.screening import RequestRejected, screen
 
 ROOT = Path(__file__).parent
 MAX_CONCURRENT = int(os.getenv("MAX_CONCURRENT_STORIES", "4"))
@@ -46,6 +50,7 @@ class ChangeRequest(BaseModel):
     intake: Intake
     story: str = Field(min_length=1, max_length=8000)
     change: str = Field(min_length=1, max_length=300)
+    token: str = Field(min_length=1, max_length=128)  # proves request, intake and story came from this server
 
 
 HIDDEN = "Hidden: this draft was not right for bedtime."
@@ -143,26 +148,52 @@ def _hooks(emit):
                 on_stage=lambda s: emit({"type": "stage", "stage": s}))
 
 
+# shortcut: without STORY_SIGNING_KEY the key changes on every restart, so a story made before a redeploy
+# can't be changed after it. Set the env var to keep tokens valid across restarts.
+_SIGNING_KEY = (os.getenv("STORY_SIGNING_KEY") or "").encode() or secrets.token_bytes(32)
+
+
+def sign(request: str, intake: Intake, story: str) -> str:
+    payload = json.dumps([request, intake.model_dump(), story], sort_keys=True).encode()
+    return hmac.new(_SIGNING_KEY, payload, hashlib.sha256).hexdigest()
+
+
 @app.post("/api/story")
 def story(body: StoryRequest, req: Request):
+    try:
+        screen(body.request)  # free check first, so junk or personal details don't use up the rate limit
+    except RequestRejected as e:
+        return JSONResponse({"detail": str(e)}, status_code=400)
+
     def work(emit):
         emit({"type": "stage", "stage": "reading"})
         intake = read_request(body.request, body.age_band)
         emit({"type": "intake", "intake": intake.model_dump()})
         result = tell_story(body.request, intake=intake, **_hooks(emit))
         best = result.drafts.index(result.best) if result.best else None
-        emit({"type": "done", "status": result.status, "best": best, "error": result.error, "request": result.request})
+        token = sign(result.request, intake, result.best.story) if result.status != "blocked" else None
+        emit({"type": "done", "status": result.status, "best": best, "error": result.error, "request": result.request,
+              "token": token})
 
     return sse(req, work)
 
 
 @app.post("/api/change")
 def change(body: ChangeRequest, req: Request):
+    try:
+        screen(body.change)
+    except RequestRejected as e:
+        return JSONResponse({"detail": str(e)}, status_code=400)
+    # The request and story come back from the browser; only accept ones this server wrote and signed.
+    if not hmac.compare_digest(body.token, sign(body.request, body.intake, body.story)):
+        return JSONResponse({"detail": "This story can't be changed anymore. Please ask for a new one."}, status_code=400)
+
     def work(emit):
         result = change_story(body.request, body.intake, body.story, body.change, **_hooks(emit))
         emit({"type": "done", "applied": result is not None, "status": result.status if result else None,
               "best": result.drafts.index(result.best) if result else None,
-              "request": result.request if result else body.request})
+              "request": result.request if result else body.request,
+              "token": sign(result.request, body.intake, result.best.story) if result else body.token})
 
     return sse(req, work)
 

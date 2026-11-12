@@ -18,7 +18,7 @@ export type StoryEvent =
   | { type: "stage"; stage: Stage }
   | { type: "intake"; intake: Intake }
   | { type: "draft"; draft: Draft }
-  | { type: "done"; status: Status | null; best: number | null; request: string; error?: string | null; applied?: boolean }
+  | { type: "done"; status: Status | null; best: number | null; request: string; error?: string | null; applied?: boolean; token: string | null }
   | { type: "error"; message: string };
 
 /** POST to a streaming endpoint and call onEvent for each Server-Sent Event, ending with `done` or `error`. */
@@ -32,7 +32,7 @@ export async function stream(path: string, body: unknown, onEvent: (e: StoryEven
   if (!res.ok || !res.body) {
     const detail =
       res.status === 422 ? "Please check your request (it may be too long)."
-      : res.status === 429 || res.status === 503 ? ((await res.json().catch(() => null))?.detail ?? "Please try again later.")
+      : [400, 429, 503].includes(res.status) ? ((await res.json().catch(() => null))?.detail ?? "Please try again later.")
       : `Server error (${res.status}).`;
     onEvent({ type: "error", message: detail });
     return;

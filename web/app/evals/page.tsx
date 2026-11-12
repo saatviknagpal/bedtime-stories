@@ -6,8 +6,8 @@ import { ArrowLeft, MoonStars } from "@phosphor-icons/react";
 import { CHECK_LABELS } from "@/lib/api";
 
 type Row = {
-  id: string; kind: string; request: string; status: string; rounds: number; first_passed: boolean;
-  failed_checks: string[]; scores: Record<string, number>; words: number; grade: number; secs: number;
+  id: string; kind: string; request: string; status: string; rounds: number | null; first_passed: boolean | null;
+  failed_checks: string[] | null; scores: Record<string, number> | null; words: number | null; grade: number | null; secs: number;
 };
 type Golden = { case: string; flaw: string; caught_each: boolean[] };
 type Pair = { case: string; outcome: "win" | "tie" | "loss" };
@@ -35,8 +35,11 @@ export default function EvalsPage() {
   }, []);
 
   const rows = data?.rows ?? [];
-  const passed = rows.filter((r) => r.status === "passed").length;
-  const firstPassed = rows.filter((r) => r.first_passed).length;
+  const stories = rows.filter((r) => r.kind !== "screened"); // screened cases should be turned away, not written
+  const screened = rows.filter((r) => r.kind === "screened");
+  const turnedAway = screened.filter((r) => r.status === "rejected").length;
+  const passed = stories.filter((r) => r.status === "passed").length;
+  const firstPassed = stories.filter((r) => r.first_passed).length;
   const blocked = rows.filter((r) => r.status === "blocked").length;
   const wins = data?.pairwise?.filter((p) => p.outcome === "win").length ?? 0;
   const flaws = Object.keys(FLAW_LABELS).map((flaw) => {
@@ -60,7 +63,7 @@ export default function EvalsPage() {
         <h1 className="font-story text-3xl sm:text-4xl font-semibold text-slate-50">How the stories are tested</h1>
         <p className="mt-3 max-w-3xl text-slate-300">
           Every story goes through a writer, an AI reviewer, and automatic checks. These are the results of running the
-          whole system on 20 test requests, plus a test of whether the reviewer catches problems we planted on purpose.
+          whole system on {rows.length} test requests ({stories.length} story ideas and {screened.length} inputs that should be turned away), plus a test of whether the reviewer catches problems we planted on purpose.
         </p>
         {data?.run && <p className="mt-2 text-xs text-muted">Run {data.run} · total cost ${data.cost_usd.toFixed(3)}</p>}
       </section>
@@ -70,9 +73,10 @@ export default function EvalsPage() {
 
       {data && (
         <div className="space-y-10">
-          <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
-            <Stat label="Passed review" value={`${passed}/${rows.length}`} note="after up to 2 rewrites" />
-            <Stat label="Passed on first draft" value={`${firstPassed}/${rows.length}`} note="before any rewrite" />
+          <div className="grid gap-4 grid-cols-2 lg:grid-cols-5">
+            <Stat label="Passed review" value={`${passed}/${stories.length}`} note="after up to 2 rewrites" />
+            <Stat label="Passed on first draft" value={`${firstPassed}/${stories.length}`} note="before any rewrite" />
+            <Stat label="Junk & personal info turned away" value={`${turnedAway}/${screened.length}`} note="no model call for junk or personal details" />
             <Stat label="Stories blocked" value={`${blocked}`} note="withheld as not safe; scary and trick requests were softened instead" />
             <Stat label="Rewrite beat first draft" value={data.pairwise ? `${wins}/${data.pairwise.length}` : "–"} note="judged side by side, both orders" />
           </div>
@@ -111,14 +115,14 @@ export default function EvalsPage() {
                       <td className="px-2 py-2.5 text-slate-200 max-w-[320px]">{r.request}</td>
                       <td className="px-2 py-2.5 text-muted capitalize">{r.kind}</td>
                       <td className="px-2 py-2.5">
-                        <span className={r.status === "passed" ? "text-pass" : r.status === "blocked" ? "text-block" : "text-fail"}>{r.status}</span>
-                        {r.failed_checks.length > 0 && (
-                          <span className="block text-xs text-muted">{r.failed_checks.map((c) => CHECK_LABELS[c] ?? c).join(", ")}</span>
+                        <span className={r.status === "passed" || (r.kind === "screened" && r.status === "rejected") ? "text-pass" : r.status === "blocked" ? "text-block" : "text-fail"}>{r.status}</span>
+                        {(r.failed_checks?.length ?? 0) > 0 && (
+                          <span className="block text-xs text-muted">{r.failed_checks!.map((c) => CHECK_LABELS[c] ?? c).join(", ")}</span>
                         )}
                       </td>
-                      <td className="px-2 py-2.5 tabular-nums text-slate-300">{r.rounds}</td>
-                      <td className="px-2 py-2.5 tabular-nums text-slate-300">{r.words}</td>
-                      <td className="px-2 py-2.5 tabular-nums text-slate-300">{r.grade}</td>
+                      <td className="px-2 py-2.5 tabular-nums text-slate-300">{r.rounds ?? "–"}</td>
+                      <td className="px-2 py-2.5 tabular-nums text-slate-300">{r.words ?? "–"}</td>
+                      <td className="px-2 py-2.5 tabular-nums text-slate-300">{r.grade ?? "–"}</td>
                       <td className="px-2 py-2.5 tabular-nums text-slate-300">{Math.round(r.secs)}s</td>
                     </tr>
                   ))}

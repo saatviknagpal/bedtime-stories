@@ -6,6 +6,7 @@ from pydantic import ValidationError
 from story.llm import LLMError
 from story.pipeline import CHECKS, Intake, Verdict, request_change, tell_story
 from story.prompts import EXTRA_GENTLE
+from story.screening import RequestRejected
 
 GOOD_STORY = "Sleepy Cat\n\n" + "The cat sat on the mat. The cat was warm. The cat went to sleep. " * 40
 
@@ -22,7 +23,7 @@ def run(verdicts, category="animals", story=GOOD_STORY, model_error_at=None, req
 
     def fake_structured(prompt, schema, system):
         if schema is Intake:
-            return Intake(age_band="5-7", category=category, brief="A cat naps.")
+            return Intake(is_story_idea=True, age_band="5-7", category=category, brief="A cat naps.")
         calls["judged"].append(prompt)
         item = verdicts.pop(0)
         if isinstance(item, Exception):
@@ -178,6 +179,26 @@ class TestPipeline(unittest.TestCase):
         self.assertIs(kept, first)
         self.assertEqual(len(prompts), 3)  # change + 2 revisions, no regeneration that would drop the change
         self.assertFalse(any(EXTRA_GENTLE in s for s in prompts))
+
+    def test_personal_details_rejected_before_any_model_call(self):
+        with patch("story.pipeline.call_structured") as model:
+            with self.assertRaises(RequestRejected):
+                tell_story("a story for my kid, we live at 42 Maple Street")
+            model.assert_not_called()
+
+    def test_not_a_story_idea_rejected_after_intake(self):
+        no = Intake(is_story_idea=False, age_band="5-7", category="everyday", brief="")
+        with patch("story.pipeline.call_structured", return_value=no), patch("story.pipeline.call_model") as writer:
+            with self.assertRaises(RequestRejected):
+                tell_story("what is 7 times 8")
+            writer.assert_not_called()
+
+    def test_change_with_personal_details_rejected(self):
+        first, _ = run([verdict()])
+        with patch("story.pipeline.call_model") as writer:
+            with self.assertRaises(RequestRejected):
+                request_change(first, "add my email maya@example.com")
+            writer.assert_not_called()
 
     def test_out_of_range_score_rejected(self):
         with self.assertRaises(ValidationError):

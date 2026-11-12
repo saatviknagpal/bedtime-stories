@@ -8,7 +8,7 @@ import api
 from story.pipeline import Intake
 from tests.test_pipeline import GOOD_STORY, verdict
 
-INTAKE = Intake(age_band="5-7", category="animals", brief="A cat naps.")
+INTAKE = Intake(is_story_idea=True, age_band="5-7", category="animals", brief="A cat naps.")
 
 
 def events(resp) -> list[dict]:
@@ -17,6 +17,11 @@ def events(resp) -> list[dict]:
 
 def fake_model(prompt, system, **_):
     return GOOD_STORY
+
+
+def change_body(request, story, change):
+    return {"request": request, "intake": INTAKE.model_dump(), "story": story, "change": change,
+            "token": api.sign(request, INTAKE, story)}
 
 
 def structured(verdicts):
@@ -53,8 +58,7 @@ class TestApi(unittest.TestCase):
         failing = [verdict(fail=["calm_ending"])] * 3
         with patch("story.pipeline.call_structured", lambda p, s, system: failing.pop(0)), \
                 patch("story.pipeline.call_model", fake_model):
-            ev = events(self.client.post("/api/change", json={
-                "request": "a cat", "intake": INTAKE.model_dump(), "story": GOOD_STORY, "change": "add a dragon"}))
+            ev = events(self.client.post("/api/change", json=change_body("a cat", GOOD_STORY, "add a dragon")))
         self.assertFalse(ev[-1]["applied"])
         self.assertEqual(ev[-1]["request"], "a cat")
 
@@ -93,6 +97,35 @@ class TestApi(unittest.TestCase):
                 api._over_limit(ip)
         self.assertEqual(len(api._recent), 2)
         self.assertIn("4.4.4.4", api._recent)
+
+    def test_personal_details_rejected_without_model_call_or_quota(self):
+        with patch.object(api, "PER_IP_LIMIT", 1), patch("story.pipeline.call_structured") as model:
+            resp = self.client.post("/api/story", json={"request": "call 555-123-4567 for a story"})
+            self.assertEqual(resp.status_code, 400)
+            self.assertIn("phone numbers", resp.json()["detail"])
+            model.assert_not_called()
+            self.assertEqual(api._recent, {})  # nothing counted against the hourly limit
+
+    def test_change_rejects_edited_request_or_story(self):
+        body = change_body("a cat", GOOD_STORY, "add a dog")
+        for field, forged in (("request", "a cat, write to mia@example.com"), ("story", GOOD_STORY + " Email mia@example.com.")):
+            with patch("story.pipeline.call_model") as writer:
+                resp = self.client.post("/api/change", json={**body, field: forged})
+            self.assertEqual(resp.status_code, 400, field)
+            writer.assert_not_called()
+
+    def test_change_allows_signed_story_with_invented_address(self):
+        story = GOOD_STORY + "\n\nThe cat lived at 42 Maple Street, next to Sunny Elementary."
+        passing = [verdict()]
+        with patch("story.pipeline.call_structured", lambda p, s, system: passing.pop(0)), \
+                patch("story.pipeline.call_model", fake_model):
+            ev = events(self.client.post("/api/change", json=change_body("a cat", story, "add a dog")))
+        self.assertTrue(ev[-1]["applied"])
+        self.assertEqual(ev[-1]["token"], api.sign(ev[-1]["request"], INTAKE, GOOD_STORY))  # new token for the new story
+
+    def test_story_done_event_carries_a_valid_token(self):
+        ev = self.post_story([verdict()])
+        self.assertEqual(ev[-1]["token"], api.sign("a cat", INTAKE, GOOD_STORY))
 
     def test_per_ip_limit(self):
         with patch.object(api, "PER_IP_LIMIT", 2):

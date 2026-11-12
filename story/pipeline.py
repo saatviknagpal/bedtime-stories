@@ -6,6 +6,7 @@ from pydantic import BaseModel, Field, ValidationError
 
 from story.checks import META_FAILURE, run_checks
 from story.llm import LLMError, call_model, call_structured
+from story.screening import NOT_A_STORY_MESSAGE, RequestRejected, screen
 from story.prompts import (
     CATEGORY_GUIDES,
     EXTRA_GENTLE,
@@ -29,6 +30,7 @@ Score = Field(ge=1, le=5)
 
 
 class Intake(BaseModel):
+    is_story_idea: bool
     age_band: Literal["5-7", "8-10"]
     category: Literal["adventure", "friendship", "animals", "funny", "fantasy", "comfort", "everyday"]
     brief: str
@@ -184,7 +186,11 @@ def system_for(intake: Intake) -> str:
 
 
 def read_request(request: str, age_band: str | None = None) -> Intake:
+    """Screen the request in code, then let the model classify it. Raises RequestRejected with a friendly message."""
+    screen(request)
     intake = call_structured(INTAKE_PROMPT.format(request=esc(request)), Intake, system=INTAKE_SYSTEM)
+    if not intake.is_story_idea:
+        raise RequestRejected(NOT_A_STORY_MESSAGE)
     if age_band:
         intake.age_band = age_band
     return intake
@@ -206,6 +212,7 @@ def change_story(request: str, intake: Intake, story: str, change: str, on_draft
     is never swapped for a worse one. No safety fallback: regenerating from the brief would drop the change.
     Takes plain values so a stateless API can call it.
     """
+    screen(change)
     result = Result(f"{request}\n\nRequested change: {change}", intake, system_for(intake), on_stage=on_stage)
     note = f"The listener asked for this change: {change}"
     _refine(result, lambda: _revise(result, story, [note]), on_draft, fallback=False)

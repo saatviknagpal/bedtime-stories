@@ -8,7 +8,7 @@ import { Progress, type Step } from "@/components/Progress";
 import { ReadAloud, StoryCard } from "@/components/StoryCard";
 import { stream, type AgeBand, type Draft, type Intake, type Status, type StoryEvent } from "@/lib/api";
 
-type Run = { drafts: Draft[]; status: Status; best: number; request: string };
+type Run = { drafts: Draft[]; status: Status; best: number; request: string; token: string }; // token: server signature, required to change it
 type Done = Extract<StoryEvent, { type: "done" }>;
 
 const EXAMPLES = [
@@ -80,11 +80,11 @@ export default function Home() {
     setRun(null);
     setIntake(null);
     go("story", "/api/story", { request: trimmed, age_band: age === "auto" ? null : age }, (e, drafts) => {
-      if (e.status === "blocked" || e.best === null || e.status === null) {
+      if (e.status === "blocked" || e.best === null || e.status === null || !e.token) {
         setMessage("I couldn’t make a story for that one that’s gentle enough for bedtime. Try another idea?");
         return;
       }
-      setRun({ drafts, status: e.status, best: e.best, request: e.request });
+      setRun({ drafts, status: e.status, best: e.best, request: e.request, token: e.token });
       setSelected(e.best);
       setAnimate(true);
     });
@@ -92,9 +92,9 @@ export default function Home() {
 
   function requestChange() {
     if (!run || !intake || !change.trim() || running) return;
-    go("change", "/api/change", { request: run.request, intake, story: run.drafts[run.best].story, change: change.trim() }, (e, drafts) => {
-      if (e.applied && e.best !== null && e.status) {
-        setRun({ drafts, status: e.status, best: e.best, request: e.request });
+    go("change", "/api/change", { request: run.request, intake, story: run.drafts[run.best].story, change: change.trim(), token: run.token }, (e, drafts) => {
+      if (e.applied && e.best !== null && e.status && e.token) {
+        setRun({ drafts, status: e.status, best: e.best, request: e.request, token: e.token });
         setSelected(e.best);
         setAnimate(true);
         setChange("");
