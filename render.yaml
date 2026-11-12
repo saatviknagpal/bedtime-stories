@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: bedtime-stories
+    runtime: docker
+    plan: free
+    healthCheckPath: /api/evals
+    envVars:
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: TRUST_PROXY
+        value: "1"
