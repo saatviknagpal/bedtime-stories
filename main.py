@@ -1,12 +1,23 @@
+"""
+Before submitting the assignment, describe here in a few sentences what you would have built next if you spent 2 more hours on this project:
+
+With two more hours I'd start collecting feedback from real readers. Each
+story would get a thumbs up or down and an optional "what was wrong?",
+saved with the request and the judge's verdict in a small Postgres table.
+Parents can tell me if their kid liked it and actually fell asleep.
+Teachers or children's librarians, rating a handful each week, can tell me
+if the words and themes fit the age, which parents don't always notice.
+Whenever people dislike a story the judge passed, that story becomes a new
+eval case, and usually a rubric fix. I already did this once by hand:
+someone read a story about a couple, said it "sounds like a love story",
+and that's where the age_fit check came from. With the ratings in place
+I'd also try a judge from a different model family and see which one
+agrees with people more.
+"""
 import argparse
 import sys
 
 from story.pipeline import CHECKS, RECOVERABLE, Draft, request_change, tell_story
-
-"""
-Before submitting the assignment, describe here in a few sentences what you would have built next if you spent 2 more hours on this project:
-
-"""
 
 example_requests = "A story about a girl named Alice and her best friend Bob, who happens to be a cat."
 
