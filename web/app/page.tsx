@@ -209,7 +209,7 @@ export default function Home() {
                     className={`rounded-full px-3.5 py-1.5 text-sm border cursor-pointer transition-colors min-h-9 disabled:cursor-not-allowed disabled:opacity-50 ${selected === i ? "border-moon/70 bg-moon/10 text-moon" : "border-white/10 text-slate-300 hover:bg-white/5"}`}>
                     {i === run.best ? "Final" : `Draft ${i + 1}`}
                     <span className={`ml-2 inline-block h-1.5 w-1.5 rounded-full align-middle ${d.passed ? "bg-pass" : d.blocked ? "bg-block" : "bg-fail"}`} aria-hidden="true" />
-                    <span className="sr-only">{d.passed ? " (passed)" : d.blocked ? " (hidden: not safe)" : " (needed work)"}</span>
+                    <span className="sr-only">{d.passed ? " (passed)" : d.blocked ? " (hidden: not right for bedtime)" : " (needed work)"}</span>
                   </button>
                 ))}
               </div>

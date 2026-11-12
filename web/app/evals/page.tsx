@@ -20,6 +20,7 @@ const FLAW_LABELS: Record<string, string> = {
   subplot: "Unrelated subplot",
   hard_words: "Paragraph of hard words",
   wrong_story: "Story for a different request",
+  romance: "Romance (boyfriend, girlfriend, kiss)",
   control: "Untouched good story (should pass)",
 };
 

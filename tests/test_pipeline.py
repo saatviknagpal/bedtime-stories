@@ -58,6 +58,11 @@ class TestPipeline(unittest.TestCase):
         self.assertEqual(result.status, "blocked")
         self.assertEqual(calls["model"], 4)  # draft + 2 revisions + 1 extra-gentle retry
 
+    def test_age_fit_failure_blocks_like_safety(self):
+        result, calls = run([verdict(fail=["age_fit"])] * 4)
+        self.assertEqual(result.status, "blocked")
+        self.assertEqual(calls["model"], 4)  # gentle retry from the reframed brief was attempted
+
     def test_safety_fallback_uses_extra_gentle_prompt(self):
         _, calls = run([verdict(fail=["safe"])] * 4)
         self.assertNotIn(EXTRA_GENTLE, calls["systems"][0])

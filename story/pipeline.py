@@ -21,8 +21,8 @@ from story.prompts import (
 
 MAX_REVISIONS = 2
 MIN_SCORE = 4
-CHECKS = ("safe", "follows_request", "clear_arc", "single_thread", "calm_ending", "story_only")
-BLOCKING = ("safe", "story_only")  # never shown to a child if these fail
+CHECKS = ("safe", "follows_request", "age_fit", "clear_arc", "single_thread", "calm_ending", "story_only")
+BLOCKING = ("safe", "age_fit", "story_only")  # never shown to a child if these fail
 RECOVERABLE = (LLMError, anthropic.APIError, ValidationError)
 
 Score = Field(ge=1, le=5)
@@ -42,6 +42,7 @@ class Check(BaseModel):
 class Verdict(BaseModel):
     safe: Check
     follows_request: Check
+    age_fit: Check
     clear_arc: Check
     single_thread: Check
     calm_ending: Check

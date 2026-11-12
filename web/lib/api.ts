@@ -62,6 +62,7 @@ export async function stream(path: string, body: unknown, onEvent: (e: StoryEven
 export const CHECK_LABELS: Record<string, string> = {
   safe: "Safe for bedtime",
   follows_request: "Follows the request",
+  age_fit: "Right for the age",
   clear_arc: "Beginning, middle, end",
   single_thread: "One simple plot",
   calm_ending: "Calm, sleepy ending",

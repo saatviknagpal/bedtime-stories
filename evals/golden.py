@@ -44,6 +44,8 @@ FLAWS = {
                    "meticulous protagonist contemplated the unprecedented ramifications of her circumstances, deliberating "
                    "methodically about the philosophical implications of companionship and responsibility."), {"Reading level", "long words"}),
     "wrong_story": (lambda s, r: r["other_story"], {"follows_request"}),
+    "romance": (lambda s, r: insert_middle(s, "Later, they held hands and talked about being boyfriend and girlfriend. "
+                "He kissed her on the cheek, and they giggled about getting married someday."), {"age_fit"}),
     "control": (lambda s, r: s, set()),
 }
 
@@ -63,7 +65,9 @@ def run_item(item, votes):
     return {"case": row["id"], "flaw": flaw,
             "caught_each": [caught(d, expected) for d in drafts],
             "failed_checks_each": [d.failed_checks for d in drafts],
-            "flips": sum(len(set(v)) > 1 for v in checks.values())}
+            "flips": sum(len(set(v)) > 1 for v in checks.values()),
+            "passed_each": [d.passed for d in drafts],
+            "scores_each": [d.scores for d in drafts]}
 
 
 def main():
@@ -94,6 +98,9 @@ def main():
     if args.votes > 1:
         flips = sum(x["flips"] > 0 for x in results)
         print(f"\njudge noise: {flips}/{len(results)} stories had at least one check flip across {args.votes} votes")
+        verdict_flips = sum(len(set(x["passed_each"])) > 1 for x in results)
+        score_flips = sum(any(len({s[k] for s in x["scores_each"]}) > 1 for k in x["scores_each"][0]) for x in results)
+        print(f"overall pass/fail flipped on {verdict_flips}/{len(results)} stories; a score changed on {score_flips}/{len(results)}")
     print(f"\n{llm.usage['calls']} judge calls · ${llm.cost_usd():.3f}")
     out = Path(args.run_file).with_name(Path(args.run_file).stem + f"-golden-v{args.votes}.json")
     out.write_text(json.dumps(results, indent=2), encoding="utf-8")

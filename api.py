@@ -48,7 +48,7 @@ class ChangeRequest(BaseModel):
     change: str = Field(min_length=1, max_length=300)
 
 
-HIDDEN = "Hidden: this draft was not safe for bedtime."
+HIDDEN = "Hidden: this draft was not right for bedtime."
 
 
 def draft_json(d: Draft) -> dict:

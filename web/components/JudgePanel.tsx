@@ -1,7 +1,7 @@
 import { CheckCircle, Prohibit, WarningCircle } from "@phosphor-icons/react";
 import { CHECK_LABELS, SCORE_LABELS, type Draft } from "@/lib/api";
 
-const BLOCKING = new Set(["safe", "story_only"]);
+const BLOCKING = new Set(["safe", "age_fit", "story_only"]); // mirrors BLOCKING in story/pipeline.py
 
 export function JudgePanel({ draft }: { draft?: Draft }) {
   if (!draft) {
@@ -79,7 +79,7 @@ export function JudgePanel({ draft }: { draft?: Draft }) {
 
 function Verdict({ draft }: { draft: Draft }) {
   if (draft.passed) return <Badge className="bg-pass/15 text-pass">Passed</Badge>;
-  if (draft.blocked) return <Badge className="bg-block/15 text-block">Not safe</Badge>;
+  if (draft.blocked) return <Badge className="bg-block/15 text-block">Held back</Badge>;
   return <Badge className="bg-fail/15 text-fail">Needs another pass</Badge>;
 }
 

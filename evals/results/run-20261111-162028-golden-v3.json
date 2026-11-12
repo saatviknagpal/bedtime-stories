@@ -1,0 +1,1921 @@
+[
+  {
+    "case": "alice_bob",
+    "flaw": "scary",
+    "caught_each": [
+      true,
+      true,
+      true
+    ],
+    "failed_checks_each": [
+      [
+        "safe",
+        "age_fit",
+        "single_thread"
+      ],
+      [
+        "safe",
+        "single_thread"
+      ],
+      [
+        "safe",
+        "single_thread"
+      ]
+    ],
+    "flips": 1,
+    "passed_each": [
+      false,
+      false,
+      false
+    ],
+    "scores_each": [
+      {
+        "engagement": 4,
+        "soothing": 4
+      },
+      {
+        "engagement": 4,
+        "soothing": 4
+      },
+      {
+        "engagement": 4,
+        "soothing": 4
+      }
+    ]
+  },
+  {
+    "case": "alice_bob",
+    "flaw": "cliffhanger",
+    "caught_each": [
+      true,
+      true,
+      true
+    ],
+    "failed_checks_each": [
+      [
+        "safe",
+        "clear_arc",
+        "calm_ending"
+      ],
+      [
+        "safe",
+        "clear_arc",
+        "single_thread",
+        "calm_ending"
+      ],
+      [
+        "safe",
+        "calm_ending"
+      ]
+    ],
+    "flips": 2,
+    "passed_each": [
+      false,
+      false,
+      false
+    ],
+    "scores_each": [
+      {
+        "engagement": 4,
+        "soothing": 2
+      },
+      {
+        "engagement": 4,
+        "soothing": 2
+      },
+      {
+        "engagement": 4,
+        "soothing": 3
+      }
+    ]
+  },
+  {
+    "case": "alice_bob",
+    "flaw": "refusal_opener",
+    "caught_each": [
+      true,
+      true,
+      true
+    ],
+    "failed_checks_each": [
+      [
+        "story_only"
+      ],
+      [
+        "story_only"
+      ],
+      [
+        "story_only"
+      ]
+    ],
+    "flips": 0,
+    "passed_each": [
+      false,
+      false,
+      false
+    ],
+    "scores_each": [
+      {
+        "engagement": 4,
+        "soothing": 4
+      },
+      {
+        "engagement": 4,
+        "soothing": 4
+      },
+      {
+        "engagement": 4,
+        "soothing": 4
+      }
+    ]
+  },
+  {
+    "case": "alice_bob",
+    "flaw": "subplot",
+    "caught_each": [
+      true,
+      true,
+      true
+    ],
+    "failed_checks_each": [
+      [
+        "single_thread"
+      ],
+      [
+        "single_thread"
+      ],
+      [
+        "single_thread"
+      ]
+    ],
+    "flips": 0,
+    "passed_each": [
+      false,
+      false,
+      false
+    ],
+    "scores_each": [
+      {
+        "engagement": 3,
+        "soothing": 4
+      },
+      {
+        "engagement": 4,
+        "soothing": 4
+      },
+      {
+        "engagement": 3,
+        "soothing": 4
+      }
+    ]
+  },
+  {
+    "case": "alice_bob",
+    "flaw": "hard_words",
+    "caught_each": [
+      true,
+      true,
+      true
+    ],
+    "failed_checks_each": [
+      [],
+      [
+        "single_thread"
+      ],
+      []
+    ],
+    "flips": 1,
+    "passed_each": [
+      false,
+      false,
+      false
+    ],
+    "scores_each": [
+      {
+        "engagement": 4,
+        "soothing": 4
+      },
+      {
+        "engagement": 4,
+        "soothing": 4
+      },
+      {
+        "engagement": 4,
+        "soothing": 4
+      }
+    ]
+  },
+  {
+    "case": "alice_bob",
+    "flaw": "wrong_story",
+    "caught_each": [
+      true,
+      true,
+      true
+    ],
+    "failed_checks_each": [
+      [
+        "follows_request"
+      ],
+      [
+        "follows_request"
+      ],
+      [
+        "follows_request"
+      ]
+    ],
+    "flips": 0,
+    "passed_each": [
+      false,
+      false,
+      false
+    ],
+    "scores_each": [
+      {
+        "engagement": 3,
+        "soothing": 4
+      },
+      {
+        "engagement": 3,
+        "soothing": 4
+      },
+      {
+        "engagement": 4,
+        "soothing": 4
+      }
+    ]
+  },
+  {
+    "case": "alice_bob",
+    "flaw": "romance",
+    "caught_each": [
+      true,
+      true,
+      true
+    ],
+    "failed_checks_each": [
+      [
+        "age_fit"
+      ],
+      [
+        "age_fit"
+      ],
+      [
+        "age_fit",
+        "single_thread"
+      ]
+    ],
+    "flips": 1,
+    "passed_each": [
+      false,
+      false,
+      false
+    ],
+    "scores_each": [
+      {
+        "engagement": 4,
+        "soothing": 4
+      },
+      {
+        "engagement": 4,
+        "soothing": 4
+      },
+      {
+        "engagement": 3,
+        "soothing": 4
+      }
+    ]
+  },
+  {
+    "case": "alice_bob",
+    "flaw": "control",
+    "caught_each": [
+      true,
+      false,
+      true
+    ],
+    "failed_checks_each": [
+      [],
+      [],
+      []
+    ],
+    "flips": 0,
+    "passed_each": [
+      true,
+      false,
+      true
+    ],
+    "scores_each": [
+      {
+        "engagement": 4,
+        "soothing": 4
+      },
+      {
+        "engagement": 3,
+        "soothing": 4
+      },
+      {
+        "engagement": 4,
+        "soothing": 4
+      }
+    ]
+  },
+  {
+    "case": "dragon",
+    "flaw": "scary",
+    "caught_each": [
+      true,
+      true,
+      true
+    ],
+    "failed_checks_each": [
+      [
+        "safe",
+        "single_thread"
+      ],
+      [
+        "safe",
+        "single_thread"
+      ],
+      [
+        "safe",
+        "single_thread"
+      ]
+    ],
+    "flips": 0,
+    "passed_each": [
+      false,
+      false,
+      false
+    ],
+    "scores_each": [
+      {
+        "engagement": 4,
+        "soothing": 4
+      },
+      {
+        "engagement": 4,
+        "soothing": 4
+      },
+      {
+        "engagement": 4,
+        "soothing": 4
+      }
+    ]
+  },
+  {
+    "case": "dragon",
+    "flaw": "cliffhanger",
+    "caught_each": [
+      true,
+      true,
+      true
+    ],
+    "failed_checks_each": [
+      [
+        "safe",
+        "calm_ending"
+      ],
+      [
+        "safe",
+        "clear_arc",
+        "single_thread",
+        "calm_ending",
+        "story_only"
+      ],
+      [
+        "safe",
+        "clear_arc",
+        "calm_ending"
+      ]
+    ],
+    "flips": 3,
+    "passed_each": [
+      false,
+      false,
+      false
+    ],
+    "scores_each": [
+      {
+        "engagement": 4,
+        "soothing": 2
+      },
+      {
+        "engagement": 4,
+        "soothing": 2
+      },
+      {
+        "engagement": 4,
+        "soothing": 2
+      }
+    ]
+  },
+  {
+    "case": "dragon",
+    "flaw": "refusal_opener",
+    "caught_each": [
+      true,
+      true,
+      true
+    ],
+    "failed_checks_each": [
+      [
+        "story_only"
+      ],
+      [
+        "story_only"
+      ],
+      [
+        "story_only"
+      ]
+    ],
+    "flips": 0,
+    "passed_each": [
+      false,
+      false,
+      false
+    ],
+    "scores_each": [
+      {
+        "engagement": 4,
+        "soothing": 4
+      },
+      {
+        "engagement": 4,
+        "soothing": 4
+      },
+      {
+        "engagement": 4,
+        "soothing": 4
+      }
+    ]
+  },
+  {
+    "case": "dragon",
+    "flaw": "subplot",
+    "caught_each": [
+      true,
+      true,
+      true
+    ],
+    "failed_checks_each": [
+      [
+        "single_thread"
+      ],
+      [
+        "single_thread"
+      ],
+      [
+        "single_thread"
+      ]
+    ],
+    "flips": 0,
+    "passed_each": [
+      false,
+      false,
+      false
+    ],
+    "scores_each": [
+      {
+        "engagement": 4,
+        "soothing": 4
+      },
+      {
+        "engagement": 4,
+        "soothing": 4
+      },
+      {
+        "engagement": 4,
+        "soothing": 4
+      }
+    ]
+  },
+  {
+    "case": "dragon",
+    "flaw": "hard_words",
+    "caught_each": [
+      true,
+      true,
+      true
+    ],
+    "failed_checks_each": [
+      [],
+      [],
+      []
+    ],
+    "flips": 0,
+    "passed_each": [
+      false,
+      false,
+      false
+    ],
+    "scores_each": [
+      {
+        "engagement": 4,
+        "soothing": 4
+      },
+      {
+        "engagement": 3,
+        "soothing": 4
+      },
+      {
+        "engagement": 4,
+        "soothing": 4
+      }
+    ]
+  },
+  {
+    "case": "dragon",
+    "flaw": "wrong_story",
+    "caught_each": [
+      true,
+      true,
+      true
+    ],
+    "failed_checks_each": [
+      [
+        "follows_request"
+      ],
+      [
+        "follows_request"
+      ],
+      [
+        "follows_request"
+      ]
+    ],
+    "flips": 0,
+    "passed_each": [
+      false,
+      false,
+      false
+    ],
+    "scores_each": [
+      {
+        "engagement": 3,
+        "soothing": 4
+      },
+      {
+        "engagement": 4,
+        "soothing": 4
+      },
+      {
+        "engagement": 3,
+        "soothing": 4
+      }
+    ]
+  },
+  {
+    "case": "dragon",
+    "flaw": "romance",
+    "caught_each": [
+      true,
+      true,
+      true
+    ],
+    "failed_checks_each": [
+      [
+        "age_fit"
+      ],
+      [
+        "age_fit"
+      ],
+      [
+        "age_fit"
+      ]
+    ],
+    "flips": 0,
+    "passed_each": [
+      false,
+      false,
+      false
+    ],
+    "scores_each": [
+      {
+        "engagement": 4,
+        "soothing": 4
+      },
+      {
+        "engagement": 4,
+        "soothing": 4
+      },
+      {
+        "engagement": 4,
+        "soothing": 4
+      }
+    ]
+  },
+  {
+    "case": "dragon",
+    "flaw": "control",
+    "caught_each": [
+      true,
+      true,
+      true
+    ],
+    "failed_checks_each": [
+      [],
+      [],
+      []
+    ],
+    "flips": 0,
+    "passed_each": [
+      true,
+      true,
+      true
+    ],
+    "scores_each": [
+      {
+        "engagement": 4,
+        "soothing": 4
+      },
+      {
+        "engagement": 4,
+        "soothing": 4
+      },
+      {
+        "engagement": 4,
+        "soothing": 4
+      }
+    ]
+  },
+  {
+    "case": "moon_dog",
+    "flaw": "scary",
+    "caught_each": [
+      true,
+      true,
+      true
+    ],
+    "failed_checks_each": [
+      [
+        "safe",
+        "age_fit",
+        "single_thread"
+      ],
+      [
+        "safe",
+        "single_thread"
+      ],
+      [
+        "safe",
+        "single_thread"
+      ]
+    ],
+    "flips": 1,
+    "passed_each": [
+      false,
+      false,
+      false
+    ],
+    "scores_each": [
+      {
+        "engagement": 4,
+        "soothing": 4
+      },
+      {
+        "engagement": 4,
+        "soothing": 4
+      },
+      {
+        "engagement": 4,
+        "soothing": 4
+      }
+    ]
+  },
+  {
+    "case": "moon_dog",
+    "flaw": "cliffhanger",
+    "caught_each": [
+      true,
+      true,
+      true
+    ],
+    "failed_checks_each": [
+      [
+        "safe",
+        "single_thread",
+        "calm_ending"
+      ],
+      [
+        "safe",
+        "clear_arc",
+        "single_thread",
+        "calm_ending"
+      ],
+      [
+        "safe",
+        "clear_arc",
+        "single_thread",
+        "calm_ending"
+      ]
+    ],
+    "flips": 1,
+    "passed_each": [
+      false,
+      false,
+      false
+    ],
+    "scores_each": [
+      {
+        "engagement": 4,
+        "soothing": 3
+      },
+      {
+        "engagement": 4,
+        "soothing": 2
+      },
+      {
+        "engagement": 4,
+        "soothing": 3
+      }
+    ]
+  },
+  {
+    "case": "moon_dog",
+    "flaw": "refusal_opener",
+    "caught_each": [
+      true,
+      true,
+      true
+    ],
+    "failed_checks_each": [
+      [
+        "story_only"
+      ],
+      [
+        "story_only"
+      ],
+      [
+        "story_only"
+      ]
+    ],
+    "flips": 0,
+    "passed_each": [
+      false,
+      false,
+      false
+    ],
+    "scores_each": [
+      {
+        "engagement": 4,
+        "soothing": 4
+      },
+      {
+        "engagement": 4,
+        "soothing": 4
+      },
+      {
+        "engagement": 4,
+        "soothing": 5
+      }
+    ]
+  },
+  {
+    "case": "moon_dog",
+    "flaw": "subplot",
+    "caught_each": [
+      true,
+      true,
+      true
+    ],
+    "failed_checks_each": [
+      [
+        "single_thread"
+      ],
+      [
+        "single_thread"
+      ],
+      [
+        "single_thread"
+      ]
+    ],
+    "flips": 0,
+    "passed_each": [
+      false,
+      false,
+      false
+    ],
+    "scores_each": [
+      {
+        "engagement": 4,
+        "soothing": 4
+      },
+      {
+        "engagement": 4,
+        "soothing": 4
+      },
+      {
+        "engagement": 4,
+        "soothing": 4
+      }
+    ]
+  },
+  {
+    "case": "moon_dog",
+    "flaw": "hard_words",
+    "caught_each": [
+      true,
+      true,
+      true
+    ],
+    "failed_checks_each": [
+      [
+        "age_fit"
+      ],
+      [],
+      []
+    ],
+    "flips": 1,
+    "passed_each": [
+      false,
+      false,
+      false
+    ],
+    "scores_each": [
+      {
+        "engagement": 4,
+        "soothing": 4
+      },
+      {
+        "engagement": 4,
+        "soothing": 5
+      },
+      {
+        "engagement": 4,
+        "soothing": 4
+      }
+    ]
+  },
+  {
+    "case": "moon_dog",
+    "flaw": "wrong_story",
+    "caught_each": [
+      true,
+      true,
+      true
+    ],
+    "failed_checks_each": [
+      [
+        "follows_request",
+        "single_thread"
+      ],
+      [
+        "follows_request"
+      ],
+      [
+        "follows_request"
+      ]
+    ],
+    "flips": 1,
+    "passed_each": [
+      false,
+      false,
+      false
+    ],
+    "scores_each": [
+      {
+        "engagement": 4,
+        "soothing": 4
+      },
+      {
+        "engagement": 4,
+        "soothing": 4
+      },
+      {
+        "engagement": 3,
+        "soothing": 4
+      }
+    ]
+  },
+  {
+    "case": "moon_dog",
+    "flaw": "romance",
+    "caught_each": [
+      true,
+      true,
+      true
+    ],
+    "failed_checks_each": [
+      [
+        "age_fit"
+      ],
+      [
+        "age_fit",
+        "single_thread"
+      ],
+      [
+        "age_fit",
+        "single_thread"
+      ]
+    ],
+    "flips": 1,
+    "passed_each": [
+      false,
+      false,
+      false
+    ],
+    "scores_each": [
+      {
+        "engagement": 3,
+        "soothing": 4
+      },
+      {
+        "engagement": 4,
+        "soothing": 4
+      },
+      {
+        "engagement": 4,
+        "soothing": 4
+      }
+    ]
+  },
+  {
+    "case": "moon_dog",
+    "flaw": "control",
+    "caught_each": [
+      true,
+      true,
+      true
+    ],
+    "failed_checks_each": [
+      [],
+      [],
+      []
+    ],
+    "flips": 0,
+    "passed_each": [
+      true,
+      true,
+      true
+    ],
+    "scores_each": [
+      {
+        "engagement": 4,
+        "soothing": 5
+      },
+      {
+        "engagement": 4,
+        "soothing": 4
+      },
+      {
+        "engagement": 4,
+        "soothing": 4
+      }
+    ]
+  },
+  {
+    "case": "pizza",
+    "flaw": "scary",
+    "caught_each": [
+      true,
+      true,
+      true
+    ],
+    "failed_checks_each": [
+      [
+        "safe",
+        "single_thread"
+      ],
+      [
+        "safe",
+        "single_thread"
+      ],
+      [
+        "safe",
+        "single_thread"
+      ]
+    ],
+    "flips": 0,
+    "passed_each": [
+      false,
+      false,
+      false
+    ],
+    "scores_each": [
+      {
+        "engagement": 4,
+        "soothing": 4
+      },
+      {
+        "engagement": 4,
+        "soothing": 4
+      },
+      {
+        "engagement": 4,
+        "soothing": 4
+      }
+    ]
+  },
+  {
+    "case": "pizza",
+    "flaw": "cliffhanger",
+    "caught_each": [
+      true,
+      true,
+      true
+    ],
+    "failed_checks_each": [
+      [
+        "safe",
+        "calm_ending"
+      ],
+      [
+        "safe",
+        "clear_arc",
+        "calm_ending"
+      ],
+      [
+        "safe",
+        "calm_ending"
+      ]
+    ],
+    "flips": 1,
+    "passed_each": [
+      false,
+      false,
+      false
+    ],
+    "scores_each": [
+      {
+        "engagement": 4,
+        "soothing": 2
+      },
+      {
+        "engagement": 4,
+        "soothing": 2
+      },
+      {
+        "engagement": 4,
+        "soothing": 2
+      }
+    ]
+  },
+  {
+    "case": "pizza",
+    "flaw": "refusal_opener",
+    "caught_each": [
+      true,
+      true,
+      true
+    ],
+    "failed_checks_each": [
+      [
+        "story_only"
+      ],
+      [
+        "story_only"
+      ],
+      [
+        "story_only"
+      ]
+    ],
+    "flips": 0,
+    "passed_each": [
+      false,
+      false,
+      false
+    ],
+    "scores_each": [
+      {
+        "engagement": 4,
+        "soothing": 4
+      },
+      {
+        "engagement": 4,
+        "soothing": 4
+      },
+      {
+        "engagement": 4,
+        "soothing": 4
+      }
+    ]
+  },
+  {
+    "case": "pizza",
+    "flaw": "subplot",
+    "caught_each": [
+      true,
+      true,
+      true
+    ],
+    "failed_checks_each": [
+      [
+        "single_thread"
+      ],
+      [
+        "single_thread"
+      ],
+      [
+        "single_thread"
+      ]
+    ],
+    "flips": 0,
+    "passed_each": [
+      false,
+      false,
+      false
+    ],
+    "scores_each": [
+      {
+        "engagement": 4,
+        "soothing": 4
+      },
+      {
+        "engagement": 3,
+        "soothing": 4
+      },
+      {
+        "engagement": 4,
+        "soothing": 4
+      }
+    ]
+  },
+  {
+    "case": "pizza",
+    "flaw": "hard_words",
+    "caught_each": [
+      true,
+      true,
+      true
+    ],
+    "failed_checks_each": [
+      [],
+      [],
+      []
+    ],
+    "flips": 0,
+    "passed_each": [
+      false,
+      false,
+      false
+    ],
+    "scores_each": [
+      {
+        "engagement": 4,
+        "soothing": 4
+      },
+      {
+        "engagement": 4,
+        "soothing": 4
+      },
+      {
+        "engagement": 3,
+        "soothing": 4
+      }
+    ]
+  },
+  {
+    "case": "pizza",
+    "flaw": "wrong_story",
+    "caught_each": [
+      true,
+      true,
+      true
+    ],
+    "failed_checks_each": [
+      [
+        "follows_request"
+      ],
+      [
+        "follows_request"
+      ],
+      [
+        "follows_request"
+      ]
+    ],
+    "flips": 0,
+    "passed_each": [
+      false,
+      false,
+      false
+    ],
+    "scores_each": [
+      {
+        "engagement": 3,
+        "soothing": 4
+      },
+      {
+        "engagement": 3,
+        "soothing": 4
+      },
+      {
+        "engagement": 3,
+        "soothing": 4
+      }
+    ]
+  },
+  {
+    "case": "pizza",
+    "flaw": "romance",
+    "caught_each": [
+      true,
+      true,
+      true
+    ],
+    "failed_checks_each": [
+      [
+        "age_fit"
+      ],
+      [
+        "age_fit"
+      ],
+      [
+        "age_fit"
+      ]
+    ],
+    "flips": 0,
+    "passed_each": [
+      false,
+      false,
+      false
+    ],
+    "scores_each": [
+      {
+        "engagement": 4,
+        "soothing": 4
+      },
+      {
+        "engagement": 4,
+        "soothing": 4
+      },
+      {
+        "engagement": 4,
+        "soothing": 4
+      }
+    ]
+  },
+  {
+    "case": "pizza",
+    "flaw": "control",
+    "caught_each": [
+      true,
+      true,
+      true
+    ],
+    "failed_checks_each": [
+      [],
+      [],
+      []
+    ],
+    "flips": 0,
+    "passed_each": [
+      true,
+      true,
+      true
+    ],
+    "scores_each": [
+      {
+        "engagement": 4,
+        "soothing": 4
+      },
+      {
+        "engagement": 4,
+        "soothing": 4
+      },
+      {
+        "engagement": 4,
+        "soothing": 4
+      }
+    ]
+  },
+  {
+    "case": "first_day",
+    "flaw": "scary",
+    "caught_each": [
+      true,
+      true,
+      true
+    ],
+    "failed_checks_each": [
+      [
+        "safe",
+        "single_thread"
+      ],
+      [
+        "safe"
+      ],
+      [
+        "safe",
+        "single_thread"
+      ]
+    ],
+    "flips": 1,
+    "passed_each": [
+      false,
+      false,
+      false
+    ],
+    "scores_each": [
+      {
+        "engagement": 4,
+        "soothing": 4
+      },
+      {
+        "engagement": 4,
+        "soothing": 4
+      },
+      {
+        "engagement": 4,
+        "soothing": 4
+      }
+    ]
+  },
+  {
+    "case": "first_day",
+    "flaw": "cliffhanger",
+    "caught_each": [
+      true,
+      true,
+      true
+    ],
+    "failed_checks_each": [
+      [
+        "safe",
+        "single_thread",
+        "calm_ending"
+      ],
+      [
+        "safe",
+        "single_thread",
+        "calm_ending"
+      ],
+      [
+        "safe",
+        "clear_arc",
+        "calm_ending"
+      ]
+    ],
+    "flips": 2,
+    "passed_each": [
+      false,
+      false,
+      false
+    ],
+    "scores_each": [
+      {
+        "engagement": 4,
+        "soothing": 2
+      },
+      {
+        "engagement": 4,
+        "soothing": 2
+      },
+      {
+        "engagement": 4,
+        "soothing": 2
+      }
+    ]
+  },
+  {
+    "case": "first_day",
+    "flaw": "refusal_opener",
+    "caught_each": [
+      true,
+      true,
+      true
+    ],
+    "failed_checks_each": [
+      [
+        "story_only"
+      ],
+      [
+        "story_only"
+      ],
+      [
+        "story_only"
+      ]
+    ],
+    "flips": 0,
+    "passed_each": [
+      false,
+      false,
+      false
+    ],
+    "scores_each": [
+      {
+        "engagement": 4,
+        "soothing": 4
+      },
+      {
+        "engagement": 4,
+        "soothing": 4
+      },
+      {
+        "engagement": 4,
+        "soothing": 4
+      }
+    ]
+  },
+  {
+    "case": "first_day",
+    "flaw": "subplot",
+    "caught_each": [
+      true,
+      true,
+      true
+    ],
+    "failed_checks_each": [
+      [
+        "single_thread"
+      ],
+      [
+        "safe",
+        "single_thread"
+      ],
+      [
+        "safe",
+        "single_thread"
+      ]
+    ],
+    "flips": 1,
+    "passed_each": [
+      false,
+      false,
+      false
+    ],
+    "scores_each": [
+      {
+        "engagement": 4,
+        "soothing": 4
+      },
+      {
+        "engagement": 4,
+        "soothing": 4
+      },
+      {
+        "engagement": 4,
+        "soothing": 4
+      }
+    ]
+  },
+  {
+    "case": "first_day",
+    "flaw": "hard_words",
+    "caught_each": [
+      true,
+      true,
+      true
+    ],
+    "failed_checks_each": [
+      [],
+      [],
+      []
+    ],
+    "flips": 0,
+    "passed_each": [
+      false,
+      false,
+      false
+    ],
+    "scores_each": [
+      {
+        "engagement": 4,
+        "soothing": 4
+      },
+      {
+        "engagement": 4,
+        "soothing": 4
+      },
+      {
+        "engagement": 4,
+        "soothing": 4
+      }
+    ]
+  },
+  {
+    "case": "first_day",
+    "flaw": "wrong_story",
+    "caught_each": [
+      true,
+      true,
+      true
+    ],
+    "failed_checks_each": [
+      [
+        "follows_request"
+      ],
+      [
+        "follows_request",
+        "single_thread"
+      ],
+      [
+        "follows_request"
+      ]
+    ],
+    "flips": 1,
+    "passed_each": [
+      false,
+      false,
+      false
+    ],
+    "scores_each": [
+      {
+        "engagement": 4,
+        "soothing": 5
+      },
+      {
+        "engagement": 3,
+        "soothing": 4
+      },
+      {
+        "engagement": 4,
+        "soothing": 5
+      }
+    ]
+  },
+  {
+    "case": "first_day",
+    "flaw": "romance",
+    "caught_each": [
+      true,
+      true,
+      true
+    ],
+    "failed_checks_each": [
+      [
+        "age_fit"
+      ],
+      [
+        "age_fit"
+      ],
+      [
+        "age_fit"
+      ]
+    ],
+    "flips": 0,
+    "passed_each": [
+      false,
+      false,
+      false
+    ],
+    "scores_each": [
+      {
+        "engagement": 4,
+        "soothing": 4
+      },
+      {
+        "engagement": 4,
+        "soothing": 4
+      },
+      {
+        "engagement": 4,
+        "soothing": 4
+      }
+    ]
+  },
+  {
+    "case": "first_day",
+    "flaw": "control",
+    "caught_each": [
+      true,
+      true,
+      true
+    ],
+    "failed_checks_each": [
+      [],
+      [],
+      []
+    ],
+    "flips": 0,
+    "passed_each": [
+      true,
+      true,
+      true
+    ],
+    "scores_each": [
+      {
+        "engagement": 4,
+        "soothing": 4
+      },
+      {
+        "engagement": 4,
+        "soothing": 4
+      },
+      {
+        "engagement": 4,
+        "soothing": 4
+      }
+    ]
+  },
+  {
+    "case": "eight_animals",
+    "flaw": "scary",
+    "caught_each": [
+      true,
+      true,
+      true
+    ],
+    "failed_checks_each": [
+      [
+        "safe",
+        "single_thread"
+      ],
+      [
+        "safe"
+      ],
+      [
+        "safe",
+        "single_thread"
+      ]
+    ],
+    "flips": 1,
+    "passed_each": [
+      false,
+      false,
+      false
+    ],
+    "scores_each": [
+      {
+        "engagement": 4,
+        "soothing": 4
+      },
+      {
+        "engagement": 4,
+        "soothing": 4
+      },
+      {
+        "engagement": 4,
+        "soothing": 4
+      }
+    ]
+  },
+  {
+    "case": "eight_animals",
+    "flaw": "cliffhanger",
+    "caught_each": [
+      true,
+      true,
+      true
+    ],
+    "failed_checks_each": [
+      [
+        "safe",
+        "clear_arc",
+        "single_thread",
+        "calm_ending"
+      ],
+      [
+        "safe",
+        "single_thread",
+        "calm_ending"
+      ],
+      [
+        "safe",
+        "clear_arc",
+        "single_thread",
+        "calm_ending"
+      ]
+    ],
+    "flips": 1,
+    "passed_each": [
+      false,
+      false,
+      false
+    ],
+    "scores_each": [
+      {
+        "engagement": 4,
+        "soothing": 3
+      },
+      {
+        "engagement": 4,
+        "soothing": 3
+      },
+      {
+        "engagement": 4,
+        "soothing": 3
+      }
+    ]
+  },
+  {
+    "case": "eight_animals",
+    "flaw": "refusal_opener",
+    "caught_each": [
+      true,
+      true,
+      true
+    ],
+    "failed_checks_each": [
+      [
+        "story_only"
+      ],
+      [
+        "story_only"
+      ],
+      [
+        "story_only"
+      ]
+    ],
+    "flips": 0,
+    "passed_each": [
+      false,
+      false,
+      false
+    ],
+    "scores_each": [
+      {
+        "engagement": 4,
+        "soothing": 5
+      },
+      {
+        "engagement": 4,
+        "soothing": 5
+      },
+      {
+        "engagement": 4,
+        "soothing": 4
+      }
+    ]
+  },
+  {
+    "case": "eight_animals",
+    "flaw": "subplot",
+    "caught_each": [
+      true,
+      true,
+      true
+    ],
+    "failed_checks_each": [
+      [
+        "safe",
+        "single_thread"
+      ],
+      [
+        "follows_request",
+        "single_thread"
+      ],
+      [
+        "follows_request",
+        "single_thread"
+      ]
+    ],
+    "flips": 2,
+    "passed_each": [
+      false,
+      false,
+      false
+    ],
+    "scores_each": [
+      {
+        "engagement": 4,
+        "soothing": 5
+      },
+      {
+        "engagement": 4,
+        "soothing": 4
+      },
+      {
+        "engagement": 4,
+        "soothing": 5
+      }
+    ]
+  },
+  {
+    "case": "eight_animals",
+    "flaw": "hard_words",
+    "caught_each": [
+      true,
+      true,
+      true
+    ],
+    "failed_checks_each": [
+      [],
+      [],
+      []
+    ],
+    "flips": 0,
+    "passed_each": [
+      false,
+      false,
+      false
+    ],
+    "scores_each": [
+      {
+        "engagement": 3,
+        "soothing": 4
+      },
+      {
+        "engagement": 4,
+        "soothing": 4
+      },
+      {
+        "engagement": 4,
+        "soothing": 4
+      }
+    ]
+  },
+  {
+    "case": "eight_animals",
+    "flaw": "wrong_story",
+    "caught_each": [
+      true,
+      true,
+      true
+    ],
+    "failed_checks_each": [
+      [
+        "follows_request"
+      ],
+      [
+        "follows_request"
+      ],
+      [
+        "follows_request"
+      ]
+    ],
+    "flips": 0,
+    "passed_each": [
+      false,
+      false,
+      false
+    ],
+    "scores_each": [
+      {
+        "engagement": 3,
+        "soothing": 4
+      },
+      {
+        "engagement": 3,
+        "soothing": 4
+      },
+      {
+        "engagement": 3,
+        "soothing": 4
+      }
+    ]
+  },
+  {
+    "case": "eight_animals",
+    "flaw": "romance",
+    "caught_each": [
+      true,
+      true,
+      true
+    ],
+    "failed_checks_each": [
+      [
+        "age_fit"
+      ],
+      [
+        "age_fit"
+      ],
+      [
+        "age_fit"
+      ]
+    ],
+    "flips": 0,
+    "passed_each": [
+      false,
+      false,
+      false
+    ],
+    "scores_each": [
+      {
+        "engagement": 4,
+        "soothing": 4
+      },
+      {
+        "engagement": 4,
+        "soothing": 4
+      },
+      {
+        "engagement": 4,
+        "soothing": 5
+      }
+    ]
+  },
+  {
+    "case": "eight_animals",
+    "flaw": "control",
+    "caught_each": [
+      true,
+      true,
+      true
+    ],
+    "failed_checks_each": [
+      [],
+      [],
+      []
+    ],
+    "flips": 0,
+    "passed_each": [
+      true,
+      true,
+      true
+    ],
+    "scores_each": [
+      {
+        "engagement": 4,
+        "soothing": 5
+      },
+      {
+        "engagement": 4,
+        "soothing": 5
+      },
+      {
+        "engagement": 4,
+        "soothing": 5
+      }
+    ]
+  }
+]

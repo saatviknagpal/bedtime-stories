@@ -30,7 +30,7 @@ export function Progress({ steps, title }: { steps: Step[]; title: string }) {
                 <p className="text-slate-100">{LABELS[s.stage]}</p>
                 {d && (
                   <p className="text-[0.8rem] text-muted">
-                    {d.passed ? "Passed every check" : d.blocked ? "Not safe for bedtime, so it won’t be shown"
+                    {d.passed ? "Passed every check" : d.blocked ? "Not right for bedtime, so it won’t be shown"
                       : `Needs work: ${[...(failed ?? []), ...Object.entries(d.scores).filter(([, v]) => v < 4).map(([k]) => `${k} score`), ...(d.code_failures.length ? ["automatic checks"] : [])].join(", ")}`}
                   </p>
                 )}
